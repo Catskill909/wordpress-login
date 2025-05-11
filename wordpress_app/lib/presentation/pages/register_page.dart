@@ -7,10 +7,17 @@ import 'package:wordpress_app/domain/blocs/auth/auth_bloc.dart';
 import 'package:wordpress_app/domain/blocs/auth/auth_event.dart';
 import 'package:wordpress_app/domain/blocs/auth/auth_state.dart';
 
-class RegisterPage extends StatelessWidget {
-  RegisterPage({super.key});
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({super.key});
 
+  @override
+  State<RegisterPage> createState() => _RegisterPageState();
+}
+
+class _RegisterPageState extends State<RegisterPage> {
   final _formKey = GlobalKey<FormBuilderState>();
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
 
   @override
   Widget build(BuildContext context) {
@@ -81,11 +88,23 @@ class RegisterPage extends StatelessWidget {
                       const SizedBox(height: 16),
                       FormBuilderTextField(
                         name: 'password',
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           labelText: 'Password',
-                          prefixIcon: Icon(Icons.lock),
+                          prefixIcon: const Icon(Icons.lock),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _obscurePassword
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _obscurePassword = !_obscurePassword;
+                              });
+                            },
+                          ),
                         ),
-                        obscureText: true,
+                        obscureText: _obscurePassword,
                         validator: FormBuilderValidators.compose([
                           FormBuilderValidators.required(),
                           FormBuilderValidators.minLength(6),
@@ -94,11 +113,24 @@ class RegisterPage extends StatelessWidget {
                       const SizedBox(height: 16),
                       FormBuilderTextField(
                         name: 'confirmPassword',
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           labelText: 'Confirm Password',
-                          prefixIcon: Icon(Icons.lock),
+                          prefixIcon: const Icon(Icons.lock),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _obscureConfirmPassword
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _obscureConfirmPassword =
+                                    !_obscureConfirmPassword;
+                              });
+                            },
+                          ),
                         ),
-                        obscureText: true,
+                        obscureText: _obscureConfirmPassword,
                         validator: FormBuilderValidators.compose([
                           FormBuilderValidators.required(),
                           (value) {
