@@ -9,8 +9,8 @@ This document outlines the steps needed to implement email-based features in the
 - ✅ Login and logout functionality is working in the Flutter app
 - ✅ JSON API core plugin installed and activated
 - ✅ JSON API User plugin installed but User controller is not activated
-- 🔄 Registration functionality updated to use WordPress REST API instead
-- 🔄 Password reset functionality updated to redirect to WordPress password reset page
+- ✅ Registration functionality updated to use WordPress REST API with admin authentication
+- ✅ Password reset functionality updated to use WordPress REST API with admin authentication
 
 ## 1. User Registration with Email Verification
 
@@ -46,18 +46,23 @@ This document outlines the steps needed to implement email-based features in the
 
 1. **Update API Constants**: ✅
    - Open `lib/core/constants/app_constants.dart`
-   - Update the registration endpoint to use WordPress REST API instead:
+   - Update the registration endpoint to use WordPress REST API with admin authentication:
      ```dart
      static const String jsonApiUrl = '$baseUrl/?json=';
      static const String registerEndpoint = '$apiUrl/wp/v2/users';
-     static const String forgotPasswordEndpoint = '$baseUrl/wp-login.php?action=lostpassword';
+     static const String forgotPasswordEndpoint = '$apiUrl/wp/v2/users/lostpassword';
+
+     // Admin credentials for creating users (only for demo purposes)
+     static const String adminUsername = 'admin';
+     static const String adminPassword = 'password'; // Replace with actual admin password
      ```
 
 2. **Update Registration Data Source**: ✅
-   - Modify the `register` method in `auth_remote_data_source.dart` to use the WordPress REST API
-   - Update the method to send JSON data in the request body
+   - Modify the `register` method in `auth_remote_data_source.dart` to use admin authentication
+   - First get an admin token using the JWT authentication endpoint
+   - Then create the user with the admin token in the Authorization header
    - Add proper error handling for the WordPress REST API response format
-   - Update the password reset method to redirect to the WordPress password reset page
+   - Update the password reset method to use admin authentication as well
 
 3. **Implement Registration UI**:
    - Complete the registration screen in `lib/presentation/pages/register_page.dart`
