@@ -26,16 +26,14 @@ This document outlines the steps needed to implement email-based features in the
    - Configure the email verification template
    - Ensure the "From" email is set to login@djchucks.com
 
-3. **Test Registration Endpoint**:
+3. **Test Registration Endpoint**: ✅
    - Use ReqBin or Postman to test the registration endpoint
-   - Send a POST request to `https://djchucks.com/tester/wp-json/json-api-user/register`
-   - Include the following JSON body:
-     ```json
-     {
-       "username": "testuser",
-       "email": "your-test-email@example.com",
-       "password": "securepassword123"
-     }
+   - Send a POST request to `https://djchucks.com/tester/?json=json-api-user/register`
+   - Include the following parameters in the URL or as form data:
+     ```
+     username=testuser
+     email=your-test-email@example.com
+     password=securepassword123
      ```
    - Verify that you receive a success response
    - Check that a verification email is sent to the provided email address

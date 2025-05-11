@@ -754,9 +754,10 @@ class LoginPage extends StatelessWidget {
 
 1. ✅ Test WordPress API endpoints with Flutter app (JWT Authentication tested and working)
 2. 🔄 Implement email-based features:
-   - Test JSON API User registration endpoint
-   - Update Flutter app to use the JSON API User endpoints
-   - Implement password reset functionality
+   - ✅ Test JSON API User registration endpoint (working at `/?json=json-api-user/register`)
+   - ✅ Update Flutter app constants to use the correct JSON API User endpoints
+   - 🔄 Update the registration screen to use the new endpoint
+   - 🔄 Implement password reset functionality
 3. Set up Custom Post Types and Advanced Custom Fields
 4. Implement content display in Flutter app
 5. Add user profile management
