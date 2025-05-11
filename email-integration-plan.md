@@ -7,18 +7,19 @@ This document outlines the steps needed to implement email-based features in the
 - ✅ WordPress backend is set up with JWT Authentication
 - ✅ WP Mail SMTP is configured with login@djchucks.com
 - ✅ Login and logout functionality is working in the Flutter app
-- ❌ User registration endpoint is not yet available
+- ✅ JSON API core plugin installed and activated
+- ✅ JSON API User plugin installed and activated
+- ❌ User registration endpoint needs to be tested
 - ❌ Password reset functionality is not yet implemented
 
 ## 1. User Registration with Email Verification
 
 ### 1.1 WordPress Configuration
 
-1. **Install JSON API User Plugin**:
-   - Go to WordPress admin > Plugins > Add New
-   - Search for "JSON API User"
-   - Install and activate the plugin
-   - This will add the necessary endpoints for user registration
+1. **Install Required Plugins**: ✅
+   - JSON API core plugin (installed)
+   - JSON API User plugin (installed)
+   - These plugins provide the necessary endpoints for user registration and password reset
 
 2. **Configure Email Templates**:
    - Go to WordPress admin > Settings > JSON API User (if available)

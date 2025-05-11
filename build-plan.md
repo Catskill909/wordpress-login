@@ -734,23 +734,28 @@ class LoginPage extends StatelessWidget {
    - ✅ Custom Post Type UI
    - ✅ Wordfence Security
    - ✅ WP Super Cache
+   - ✅ JSON API (core plugin)
+   - ✅ JSON API User (for registration and password reset)
 
 ### Current Tasks
 
 1. ✅ Configure WordPress plugins:
    - ✅ JWT Authentication setup
    - ✅ CORS configuration
+   - ✅ JSON API and JSON API User plugins installed
    - 🔄 Custom API endpoints
 2. ✅ Set up DirectAdmin email with WP Mail SMTP (Working with login@djchucks.com, minor DMARC issues to resolve)
 3. ✅ Implement basic authentication in Flutter app:
    - ✅ Login functionality
    - ✅ Logout functionality
+   - ✅ Password visibility toggle with eye icon
 
 ### Next Tasks
 
 1. ✅ Test WordPress API endpoints with Flutter app (JWT Authentication tested and working)
 2. 🔄 Implement email-based features:
-   - Set up user registration with email verification
+   - Test JSON API User registration endpoint
+   - Update Flutter app to use the JSON API User endpoints
    - Implement password reset functionality
 3. Set up Custom Post Types and Advanced Custom Fields
 4. Implement content display in Flutter app
