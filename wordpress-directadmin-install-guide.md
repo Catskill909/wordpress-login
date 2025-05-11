@@ -121,13 +121,35 @@ Header always set Access-Control-Allow-Headers "Content-Type, Authorization"
 
 5. Save Settings
 
-### 2.3 Test Email Configuration
+### 2.3 Test Email Configuration ⚠️
 
 1. Scroll down to the "Email Test" section
 2. Enter a test email address (your personal email)
 3. Click "Send Email"
 4. Check if you receive the test email
 5. If successful, you'll see a success message
+
+**Status: PARTIALLY WORKING** ⚠️ - WP Mail SMTP reports successful sending but emails are not being received. See troubleshooting section below.
+
+### 2.4 Email Troubleshooting
+
+If WP Mail SMTP reports that emails are sent successfully but you're not receiving them:
+
+1. **Check Spam/Junk Folder**: Emails may be filtered as spam, especially for new configurations
+2. **Verify Email Server Settings**:
+   - Confirm the SMTP host is correct (usually mail.yourdomain.com)
+   - Verify the port (587 for TLS, 465 for SSL)
+   - Double-check username (full email address) and password
+3. **Email Deliverability**:
+   - Check if your domain has proper SPF, DKIM, and DMARC records
+   - Add these DNS records in DirectAdmin if missing
+4. **Server Restrictions**:
+   - Some hosting providers block outgoing SMTP traffic
+   - Check if your hosting provider allows outgoing SMTP on the configured port
+5. **Test with Different Email**:
+   - Try sending to a different email address (Gmail, Outlook, etc.)
+6. **Check DirectAdmin Logs**:
+   - Log into DirectAdmin and check mail logs for delivery errors
 
 ## 3. Custom Post Types and REST API Configuration
 
