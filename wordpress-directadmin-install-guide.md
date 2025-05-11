@@ -121,7 +121,7 @@ Header always set Access-Control-Allow-Headers "Content-Type, Authorization"
 
 5. Save Settings
 
-### 2.3 Test Email Configuration ⚠️
+### 2.3 Test Email Configuration ✅
 
 1. Scroll down to the "Email Test" section
 2. Enter a test email address (your personal email)
@@ -129,27 +129,33 @@ Header always set Access-Control-Allow-Headers "Content-Type, Authorization"
 4. Check if you receive the test email
 5. If successful, you'll see a success message
 
-**Status: PARTIALLY WORKING** ⚠️ - WP Mail SMTP reports successful sending but emails are not being received. See troubleshooting section below.
+**Status: WORKING** ✅ - Email delivery is functioning with login@djchucks.com as the sender. Some DMARC errors may appear but don't affect delivery.
 
-### 2.4 Email Troubleshooting
+### 2.4 Improving Email Deliverability
 
-If WP Mail SMTP reports that emails are sent successfully but you're not receiving them:
+To resolve DMARC errors and improve email deliverability:
 
-1. **Check Spam/Junk Folder**: Emails may be filtered as spam, especially for new configurations
-2. **Verify Email Server Settings**:
-   - Confirm the SMTP host is correct (usually mail.yourdomain.com)
-   - Verify the port (587 for TLS, 465 for SSL)
-   - Double-check username (full email address) and password
-3. **Email Deliverability**:
-   - Check if your domain has proper SPF, DKIM, and DMARC records
-   - Add these DNS records in DirectAdmin if missing
-4. **Server Restrictions**:
-   - Some hosting providers block outgoing SMTP traffic
-   - Check if your hosting provider allows outgoing SMTP on the configured port
-5. **Test with Different Email**:
-   - Try sending to a different email address (Gmail, Outlook, etc.)
-6. **Check DirectAdmin Logs**:
-   - Log into DirectAdmin and check mail logs for delivery errors
+1. **Add SPF Record**:
+   - Log into DirectAdmin > DNS Management
+   - Add a TXT record:
+     - Name: @ (or your domain)
+     - Value: `v=spf1 a mx ip4:YOUR_SERVER_IP ~all`
+     - Replace YOUR_SERVER_IP with your actual server IP
+
+2. **Configure DKIM**:
+   - In DirectAdmin, navigate to Email Settings
+   - Look for DKIM configuration options
+   - Generate DKIM keys for your domain
+   - Add the provided TXT record to your DNS settings
+
+3. **Add DMARC Record**:
+   - Add a TXT record:
+     - Name: _dmarc
+     - Value: `v=DMARC1; p=none; rua=mailto:login@djchucks.com`
+
+4. **Test Email Delivery Again**:
+   - After adding these DNS records, wait 24-48 hours for propagation
+   - Run another test email to verify improved deliverability
 
 ## 3. Custom Post Types and REST API Configuration
 
