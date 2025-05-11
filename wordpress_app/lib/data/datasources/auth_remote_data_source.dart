@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:wordpress_app/core/constants/app_constants.dart';
 import 'package:wordpress_app/core/errors/exceptions.dart';
 import 'package:wordpress_app/core/network/dio_client.dart';
@@ -58,17 +59,66 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<UserModel> register(
       String username, String email, String password) async {
     try {
-      print('Registration endpoint: ${AppConstants.registerEndpoint}');
+      print('Registering user: $username, $email');
 
-      // Since we can't use the WordPress REST API for registration without admin privileges,
-      // we'll inform the user to use the WordPress registration page
-      throw ApiException(
-          message:
-              'Please register at ${AppConstants.registerEndpoint}\n\nUsername: $username\nEmail: $email');
+      // First, get admin authentication token
+      final authResponse = await _dioClient.post(
+        AppConstants.loginEndpoint,
+        data: {
+          'username': AppConstants.adminUsername,
+          'password': AppConstants.adminPassword,
+        },
+      );
+
+      final adminToken = authResponse['token'];
+      print('Got admin token for user creation');
+
+      // Now create the user with admin authentication
+      final response = await _dioClient.post(
+        AppConstants.registerEndpoint,
+        data: {
+          'username': username,
+          'email': email,
+          'password': password,
+          'name': username, // Display name
+          'roles': ['subscriber'], // Default role
+        },
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $adminToken',
+          },
+        ),
+      );
+
+      print('User registration response: $response');
+
+      if (response != null && response['id'] != null) {
+        print('User created with ID: ${response['id']}');
+
+        // Now log in the user to get their own token
+        final loginResponse = await login(username, password);
+
+        return loginResponse['user'] as UserModel;
+      } else {
+        throw ApiException(
+            message: 'Registration failed: Invalid response from server');
+      }
     } catch (e) {
+      print('Registration error: ${e.toString()}');
+
+      if (e is DioException && e.response != null && e.response!.data != null) {
+        final errorData = e.response!.data;
+        if (errorData is Map && errorData['message'] != null) {
+          throw ApiException(
+              message: 'Registration failed: ${errorData['message']}');
+        }
+      }
+
       if (e is ApiException) {
         rethrow;
       }
+
       throw ApiException(message: 'Registration failed: ${e.toString()}');
     }
   }
@@ -76,22 +126,60 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<void> forgotPassword(String email) async {
     try {
-      print(
-          'Sending password reset request to: ${AppConstants.forgotPasswordEndpoint}');
-      print('With parameters: user_login=$email');
+      print('Sending password reset for email: $email');
 
-      // For WordPress standard password reset, we'll redirect the user to the WordPress password reset page
-      // This is a workaround since we can't directly call the password reset API
-      // In a real app, you would implement a WebView to show this page to the user
+      // First, get admin authentication token
+      final authResponse = await _dioClient.post(
+        AppConstants.loginEndpoint,
+        data: {
+          'username': AppConstants.adminUsername,
+          'password': AppConstants.adminPassword,
+        },
+      );
 
-      // For now, we'll just inform the user that they need to go to the WordPress password reset page
-      throw ApiException(
-          message:
-              'Please go to ${AppConstants.forgotPasswordEndpoint} to reset your password');
+      final adminToken = authResponse['token'];
+      print('Got admin token for password reset');
+
+      // Now send the password reset request with admin authentication
+      final response = await _dioClient.post(
+        AppConstants.forgotPasswordEndpoint,
+        data: {
+          'email': email,
+        },
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $adminToken',
+          },
+        ),
+      );
+
+      print('Password reset response: $response');
+
+      // Check if the password reset request was successful
+      if (response != null && response['success'] != null) {
+        // Password reset email sent successfully
+        return;
+      } else {
+        throw ApiException(
+            message: 'Password reset failed: Invalid response from server');
+      }
     } catch (e) {
-      print('Password reset exception: ${e.toString()}');
-      throw ApiException(
-          message: 'Password reset request failed: ${e.toString()}');
+      print('Password reset error: ${e.toString()}');
+
+      if (e is DioException && e.response != null && e.response!.data != null) {
+        final errorData = e.response!.data;
+        if (errorData is Map && errorData['message'] != null) {
+          throw ApiException(
+              message: 'Password reset failed: ${errorData['message']}');
+        }
+      }
+
+      if (e is ApiException) {
+        rethrow;
+      }
+
+      throw ApiException(message: 'Password reset failed: ${e.toString()}');
     }
   }
 
