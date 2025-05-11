@@ -13,7 +13,8 @@ abstract class AuthRemoteDataSource {
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   final DioClient _dioClient;
 
-  AuthRemoteDataSourceImpl({required DioClient dioClient}) : _dioClient = dioClient;
+  AuthRemoteDataSourceImpl({required DioClient dioClient})
+      : _dioClient = dioClient;
 
   @override
   Future<Map<String, dynamic>> login(String username, String password) async {
@@ -25,10 +26,28 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           'password': password,
         },
       );
-      
+
+      // Create a user model from the JWT response
+      // The JWT response format is:
+      // {
+      //   "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
+      //   "user_email": "your-email@example.com",
+      //   "user_nicename": "admin",
+      //   "user_display_name": "Admin"
+      // }
+
+      final userModel = UserModel(
+        id: 1, // We don't have the ID in the response, using default admin ID
+        username: response['user_nicename'] ?? '',
+        email: response['user_email'] ?? '',
+        firstName: response['user_display_name'] ?? '',
+        lastName: '',
+        roles: ['subscriber'], // Default role
+      );
+
       return {
         'token': response['token'],
-        'user': UserModel.fromJson(response['user']),
+        'user': userModel,
       };
     } catch (e) {
       throw ApiException(message: 'Login failed: ${e.toString()}');
@@ -36,7 +55,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Future<UserModel> register(String username, String email, String password) async {
+  Future<UserModel> register(
+      String username, String email, String password) async {
     try {
       final response = await _dioClient.post(
         AppConstants.registerEndpoint,
@@ -46,7 +66,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           'password': password,
         },
       );
-      
+
       return UserModel.fromJson(response);
     } catch (e) {
       throw ApiException(message: 'Registration failed: ${e.toString()}');
@@ -63,7 +83,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         },
       );
     } catch (e) {
-      throw ApiException(message: 'Password reset request failed: ${e.toString()}');
+      throw ApiException(
+          message: 'Password reset request failed: ${e.toString()}');
     }
   }
 
