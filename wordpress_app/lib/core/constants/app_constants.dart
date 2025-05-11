@@ -2,15 +2,16 @@ class AppConstants {
   // API
   static const String baseUrl = 'https://djchucks.com/tester';
   static const String apiUrl = '$baseUrl/wp-json';
-  static const String jsonApiUrl = '$baseUrl/api/user';
+  static const String jsonApiUrl = '$baseUrl/?json=';
 
   // JWT Authentication endpoints
   static const String loginEndpoint = '$apiUrl/jwt-auth/v1/token';
   static const String userEndpoint = '$apiUrl/wp/v2/users/me';
 
-  // JSON API User endpoints
-  static const String registerEndpoint = '$jsonApiUrl/register';
-  static const String forgotPasswordEndpoint = '$jsonApiUrl/retrieve_password';
+  // Since the User controller is not activated, we'll use WordPress REST API endpoints
+  static const String registerEndpoint = '$apiUrl/wp/v2/users';
+  static const String forgotPasswordEndpoint =
+      '$baseUrl/wp-login.php?action=lostpassword';
 
   // Storage Keys
   static const String tokenKey = 'auth_token';
