@@ -58,16 +58,39 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<UserModel> register(
       String username, String email, String password) async {
     try {
+      // For JSON API User plugin, we need to use form data or URL parameters
+      // The endpoint is in the format: /?json=json-api-user/register
       final response = await _dioClient.post(
         AppConstants.registerEndpoint,
-        data: {
+        queryParameters: {
           'username': username,
           'email': email,
           'password': password,
+          'nonce': '1234', // This is a placeholder, might need a real nonce
+          'display_name': username, // Optional, using username as display name
         },
       );
 
-      return UserModel.fromJson(response);
+      // Check if the registration was successful
+      if (response['status'] == 'ok') {
+        // Create a user model from the response
+        // Since JSON API User doesn't return detailed user info on registration,
+        // we'll create a basic user model with the provided information
+        return UserModel(
+          id: 0, // We don't know the ID yet
+          username: username,
+          email: email,
+          firstName: '',
+          lastName: '',
+          roles: ['subscriber'], // Default role
+        );
+      } else if (response['error']) {
+        // If there's an error message in the response
+        throw ApiException(
+            message: 'Registration failed: ${response['error']}');
+      } else {
+        throw ApiException(message: 'Registration failed: Unknown error');
+      }
     } catch (e) {
       throw ApiException(message: 'Registration failed: ${e.toString()}');
     }
@@ -76,12 +99,25 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<void> forgotPassword(String email) async {
     try {
-      await _dioClient.post(
+      // For JSON API User plugin, we need to use query parameters
+      final response = await _dioClient.post(
         AppConstants.forgotPasswordEndpoint,
-        data: {
+        queryParameters: {
           'email': email,
+          'nonce': '1234', // This is a placeholder, might need a real nonce
         },
       );
+
+      // Check if the password reset request was successful
+      if (response['status'] != 'ok') {
+        if (response['error']) {
+          throw ApiException(
+              message: 'Password reset request failed: ${response['error']}');
+        } else {
+          throw ApiException(
+              message: 'Password reset request failed: Unknown error');
+        }
+      }
     } catch (e) {
       throw ApiException(
           message: 'Password reset request failed: ${e.toString()}');

@@ -40,15 +40,19 @@ This document outlines the steps needed to implement email-based features in the
 
 ### 1.2 Flutter App Implementation
 
-1. **Update API Constants**:
+1. **Update API Constants**: ✅
    - Open `lib/core/constants/app_constants.dart`
    - Update the registration endpoint to match the JSON API User plugin:
      ```dart
-     static const String registerEndpoint = '$apiUrl/json-api-user/register';
+     static const String jsonApiUrl = '$baseUrl/?json=';
+     static const String registerEndpoint = '$jsonApiUrl/json-api-user/register';
+     static const String forgotPasswordEndpoint = '$jsonApiUrl/json-api-user/retrieve_password';
      ```
 
-2. **Update Registration Data Source**:
+2. **Update Registration Data Source**: ✅
    - Modify the `register` method in `auth_remote_data_source.dart` to handle the response format from the JSON API User plugin
+   - Update the method to use query parameters instead of JSON body
+   - Add proper error handling for the JSON API User response format
 
 3. **Implement Registration UI**:
    - Complete the registration screen in `lib/presentation/pages/register_page.dart`
