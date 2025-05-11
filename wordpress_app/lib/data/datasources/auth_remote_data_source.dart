@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:wordpress_app/core/constants/app_constants.dart';
 import 'package:wordpress_app/core/errors/exceptions.dart';
 import 'package:wordpress_app/core/network/dio_client.dart';
@@ -59,58 +58,17 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<UserModel> register(
       String username, String email, String password) async {
     try {
-      print(
-          'Sending registration request to: ${AppConstants.registerEndpoint}');
-      print('With parameters: username=$username, email=$email');
+      print('Registration endpoint: ${AppConstants.registerEndpoint}');
 
-      // For WordPress REST API, we need to use JWT authentication
-      // First, let's try to create a user using the WordPress REST API
-      final response = await _dioClient.post(
-        AppConstants.registerEndpoint,
-        data: {
-          'username': username,
-          'email': email,
-          'password': password,
-          'name': username, // Display name
-        },
-        options: Options(
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        ),
-      );
-
-      // Log the full response for debugging
-      print('Registration response: $response');
-
-      // WordPress REST API returns the user object directly
-      if (response != null && response['id'] != null) {
-        print('User created with ID: ${response['id']}');
-        return UserModel(
-          id: response['id'],
-          username: response['username'] ?? username,
-          email: response['email'] ?? email,
-          firstName: response['first_name'] ?? '',
-          lastName: response['last_name'] ?? '',
-          roles: response['roles'] ?? ['subscriber'],
-        );
-      } else {
-        print('Unknown registration error - no user data in response');
-        throw ApiException(
-            message: 'Registration failed: No user data returned');
-      }
+      // Since we can't use the WordPress REST API for registration without admin privileges,
+      // we'll inform the user to use the WordPress registration page
+      throw ApiException(
+          message:
+              'Please register at ${AppConstants.registerEndpoint}\n\nUsername: $username\nEmail: $email');
     } catch (e) {
-      print('Registration exception: ${e.toString()}');
-
-      // Try to extract error message from DioException
-      if (e is DioException && e.response != null && e.response!.data != null) {
-        final errorData = e.response!.data;
-        if (errorData is Map && errorData['message'] != null) {
-          throw ApiException(
-              message: 'Registration failed: ${errorData['message']}');
-        }
+      if (e is ApiException) {
+        rethrow;
       }
-
       throw ApiException(message: 'Registration failed: ${e.toString()}');
     }
   }
