@@ -14,9 +14,10 @@ class AppConstants {
       '$apiUrl/wp/v2/users/lostpassword';
 
   // Admin credentials for creating users (only for demo purposes)
+  // In a production app, these would be stored securely or retrieved from environment variables
   static const String adminUsername = 'admin';
   static const String adminPassword =
-      'password'; // Replace with actual admin password
+      'admin123'; // Using a default password for testing
 
   // Storage Keys
   static const String tokenKey = 'auth_token';
