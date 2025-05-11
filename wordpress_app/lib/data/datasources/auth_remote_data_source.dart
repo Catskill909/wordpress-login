@@ -58,40 +58,76 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<UserModel> register(
       String username, String email, String password) async {
     try {
-      // For JSON API User plugin, we need to use form data or URL parameters
-      // The endpoint is in the format: /?json=json-api-user/register
+      // First, get a nonce for registration
+      print('Getting nonce for registration');
+      final nonceResponse = await _dioClient.get(
+        '${AppConstants.baseUrl}/api/get_nonce/',
+        queryParameters: {
+          'controller': 'user',
+          'method': 'register',
+        },
+      );
+
+      final nonce = nonceResponse['nonce'];
+      print('Got nonce: $nonce');
+
+      // Now register the user with the nonce
+      print(
+          'Sending registration request to: ${AppConstants.registerEndpoint}');
+      print('With parameters: username=$username, email=$email');
+
       final response = await _dioClient.post(
         AppConstants.registerEndpoint,
         queryParameters: {
           'username': username,
           'email': email,
-          'password': password,
-          'nonce': '1234', // This is a placeholder, might need a real nonce
+          'user_pass': password,
+          'nonce': nonce,
           'display_name': username, // Optional, using username as display name
+          'notify': 'both', // Send notification to both admin and user
         },
       );
 
+      // Log the full response for debugging
+      print('Registration response: $response');
+
       // Check if the registration was successful
       if (response['status'] == 'ok') {
-        // Create a user model from the response
-        // Since JSON API User doesn't return detailed user info on registration,
-        // we'll create a basic user model with the provided information
-        return UserModel(
-          id: 0, // We don't know the ID yet
-          username: username,
-          email: email,
-          firstName: '',
-          lastName: '',
-          roles: ['subscriber'], // Default role
-        );
-      } else if (response['error']) {
+        // Check if there's a user object in the response
+        if (response['user'] != null) {
+          print('User created with ID: ${response['user']['id']}');
+          // If the response contains user data, use it
+          return UserModel(
+            id: response['user']['id'] ?? 0,
+            username: response['user']['username'] ?? username,
+            email: response['user']['email'] ?? email,
+            firstName: response['user']['firstname'] ?? '',
+            lastName: response['user']['lastname'] ?? '',
+            roles: ['subscriber'], // Default role
+          );
+        } else {
+          print('No user data in response, creating basic user model');
+          // Create a basic user model with the provided information
+          return UserModel(
+            id: 0, // We don't know the ID yet
+            username: username,
+            email: email,
+            firstName: '',
+            lastName: '',
+            roles: ['subscriber'], // Default role
+          );
+        }
+      } else if (response['error'] != null) {
         // If there's an error message in the response
+        print('Registration error: ${response['error']}');
         throw ApiException(
             message: 'Registration failed: ${response['error']}');
       } else {
+        print('Unknown registration error');
         throw ApiException(message: 'Registration failed: Unknown error');
       }
     } catch (e) {
+      print('Registration exception: ${e.toString()}');
       throw ApiException(message: 'Registration failed: ${e.toString()}');
     }
   }
@@ -99,26 +135,49 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<void> forgotPassword(String email) async {
     try {
+      // First, get a nonce for password reset
+      print('Getting nonce for password reset');
+      final nonceResponse = await _dioClient.get(
+        '${AppConstants.baseUrl}/api/get_nonce/',
+        queryParameters: {
+          'controller': 'user',
+          'method': 'retrieve_password',
+        },
+      );
+
+      final nonce = nonceResponse['nonce'];
+      print('Got nonce: $nonce');
+
+      // Now send the password reset request
+      print(
+          'Sending password reset request to: ${AppConstants.forgotPasswordEndpoint}');
+      print('With parameters: user_login=$email');
+
       // For JSON API User plugin, we need to use query parameters
       final response = await _dioClient.post(
         AppConstants.forgotPasswordEndpoint,
         queryParameters: {
-          'email': email,
-          'nonce': '1234', // This is a placeholder, might need a real nonce
+          'user_login': email, // The plugin expects user_login, not email
+          'nonce': nonce,
         },
       );
 
+      print('Password reset response: $response');
+
       // Check if the password reset request was successful
       if (response['status'] != 'ok') {
-        if (response['error']) {
+        if (response['error'] != null) {
+          print('Password reset error: ${response['error']}');
           throw ApiException(
               message: 'Password reset request failed: ${response['error']}');
         } else {
+          print('Unknown password reset error');
           throw ApiException(
               message: 'Password reset request failed: Unknown error');
         }
       }
     } catch (e) {
+      print('Password reset exception: ${e.toString()}');
       throw ApiException(
           message: 'Password reset request failed: ${e.toString()}');
     }

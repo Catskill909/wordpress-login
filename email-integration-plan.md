@@ -28,12 +28,16 @@ This document outlines the steps needed to implement email-based features in the
 
 3. **Test Registration Endpoint**: ✅
    - Use ReqBin or Postman to test the registration endpoint
-   - Send a POST request to `https://djchucks.com/tester/?json=json-api-user/register`
+   - First get a nonce: `https://djchucks.com/tester/api/get_nonce/?controller=user&method=register`
+   - Then send a POST request to `https://djchucks.com/tester/api/user/register`
    - Include the following parameters in the URL or as form data:
      ```
      username=testuser
      email=your-test-email@example.com
-     password=securepassword123
+     user_pass=securepassword123
+     nonce=YOUR_NONCE_HERE
+     display_name=testuser
+     notify=both
      ```
    - Verify that you receive a success response
    - Check that a verification email is sent to the provided email address
@@ -44,9 +48,9 @@ This document outlines the steps needed to implement email-based features in the
    - Open `lib/core/constants/app_constants.dart`
    - Update the registration endpoint to match the JSON API User plugin:
      ```dart
-     static const String jsonApiUrl = '$baseUrl/?json=';
-     static const String registerEndpoint = '$jsonApiUrl/json-api-user/register';
-     static const String forgotPasswordEndpoint = '$jsonApiUrl/json-api-user/retrieve_password';
+     static const String jsonApiUrl = '$baseUrl/api/user';
+     static const String registerEndpoint = '$jsonApiUrl/register';
+     static const String forgotPasswordEndpoint = '$jsonApiUrl/retrieve_password';
      ```
 
 2. **Update Registration Data Source**: ✅
