@@ -17,6 +17,10 @@ abstract class AuthRepository {
   // Legacy method (will be updated to use the new flow)
   Future<Either<Failure, void>> forgotPassword(String email);
 
+  // Registration verification flow
+  Future<Either<Failure, void>> requestRegistrationCode(String email);
+  Future<Either<Failure, void>> verifyRegistration(String email, String code);
+
   Future<Either<Failure, User>> getCurrentUser();
   Future<Either<Failure, void>> logout();
   Future<bool> isLoggedIn();

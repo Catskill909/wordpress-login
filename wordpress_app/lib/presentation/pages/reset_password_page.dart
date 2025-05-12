@@ -52,9 +52,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
 
             // Navigate to login page
             Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(
-                builder: (context) => const LoginPage(),
-              ),
+              MaterialPageRoute(builder: (context) => const LoginPage()),
               (route) => false,
             );
           } else if (state is AuthError) {

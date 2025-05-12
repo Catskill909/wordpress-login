@@ -1,0 +1,8 @@
+{
+    "files.exclude": {
+        "wordpress-custom-reset-plugin.php": false
+    },
+    "files.associations": {
+        "wordpress-custom-reset-plugin.php": "plaintext"
+    }
+}

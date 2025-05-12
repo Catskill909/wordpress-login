@@ -155,4 +155,29 @@ class AuthRepositoryImpl implements AuthRepository {
       return false;
     }
   }
+
+  @override
+  Future<Either<Failure, void>> requestRegistrationCode(String email) async {
+    try {
+      await _remoteDataSource.requestRegistrationCode(email);
+      return const Right(null);
+    } on ApiException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    } catch (e) {
+      return Left(ServerFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> verifyRegistration(
+      String email, String code) async {
+    try {
+      await _remoteDataSource.verifyRegistration(email, code);
+      return const Right(null);
+    } on ApiException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    } catch (e) {
+      return Left(ServerFailure(message: e.toString()));
+    }
+  }
 }

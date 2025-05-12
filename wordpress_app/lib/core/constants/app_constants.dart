@@ -3,6 +3,7 @@ class AppConstants {
   static const String baseUrl = 'https://djchucks.com/tester';
   static const String apiUrl = '$baseUrl/wp-json';
   static const String jsonApiUrl = '$baseUrl/?json=';
+  static const String wpFlutterApiUrl = '$apiUrl/wp-flutter/v1';
 
   // JWT Authentication endpoints
   static const String loginEndpoint = '$apiUrl/jwt-auth/v1/token';
@@ -11,14 +12,21 @@ class AppConstants {
   // API endpoints
   static const String registerEndpoint = '$apiUrl/wp/v2/users';
 
-  // BDVS Password Reset plugin endpoints
+  // Custom WordPress Flutter Auth plugin endpoints
+  // Password reset endpoints
   static const String requestResetCodeEndpoint =
-      '$apiUrl/bdpwr/v1/reset-password';
+      '$wpFlutterApiUrl/request-reset-code';
   static const String verifyResetCodeEndpoint =
-      '$apiUrl/bdpwr/v1/validate-code';
-  static const String resetPasswordEndpoint = '$apiUrl/bdpwr/v1/set-password';
+      '$wpFlutterApiUrl/verify-reset-code';
+  static const String resetPasswordEndpoint = '$wpFlutterApiUrl/reset-password';
 
-  // Legacy password reset endpoint (kept for reference)
+  // Registration verification endpoints
+  static const String requestRegistrationCodeEndpoint =
+      '$wpFlutterApiUrl/request-registration-code';
+  static const String verifyRegistrationEndpoint =
+      '$wpFlutterApiUrl/verify-registration';
+
+  // Legacy endpoints (kept for reference)
   static const String forgotPasswordEndpoint =
       '$baseUrl/wp-login.php?action=lostpassword';
 

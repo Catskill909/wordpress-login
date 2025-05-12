@@ -55,3 +55,21 @@ class PasswordResetCodeVerified extends AuthState {
 }
 
 class PasswordResetSuccess extends AuthState {}
+
+class RegistrationCodeSent extends AuthState {
+  final String email;
+
+  const RegistrationCodeSent({required this.email});
+
+  @override
+  List<Object> get props => [email];
+}
+
+class RegistrationVerified extends AuthState {
+  final String email;
+
+  const RegistrationVerified({required this.email});
+
+  @override
+  List<Object> get props => [email];
+}

@@ -1,4 +1,7 @@
+import 'dart:convert';
+import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:http/http.dart' as http;
 import 'package:wordpress_app/core/constants/app_constants.dart';
 import 'package:wordpress_app/core/errors/exceptions.dart';
 import 'package:wordpress_app/core/network/dio_client.dart';
@@ -14,6 +17,10 @@ abstract class AuthRemoteDataSource {
   Future<String> verifyResetCode(String email, String code);
   Future<void> resetPassword(
       String email, String resetToken, String newPassword);
+
+  // Registration verification flow
+  Future<void> requestRegistrationCode(String email);
+  Future<void> verifyRegistration(String email, String code);
 
   Future<UserModel> getCurrentUser();
 }
@@ -133,54 +140,135 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<void> forgotPassword(String email) async {
     try {
-      LoggerUtil.i('Sending password reset for email: $email');
+      LoggerUtil.i('Requesting password reset code for email: $email');
 
-      // Use WordPress's standard password reset form
+      // Try multiple approaches to ensure the request goes through
+
+      // Approach 1: Use Process.run to execute curl command directly
       try {
-        // Create a Dio instance with custom validation
+        LoggerUtil.i('Trying approach 1: Using Process.run with curl');
+
+        final result = await Process.run('curl', [
+          '-v',
+          '-X',
+          'POST',
+          '-H',
+          'Content-Type: application/json',
+          '-d',
+          '{"email":"$email"}',
+          AppConstants.requestResetCodeEndpoint,
+        ]);
+
+        LoggerUtil.i('Curl stdout: ${result.stdout}');
+        LoggerUtil.i('Curl stderr: ${result.stderr}');
+
+        if (result.exitCode == 0) {
+          final response = jsonDecode(result.stdout.toString());
+          LoggerUtil.i(
+              'Password reset code request response (curl): $response');
+
+          if (response['status'] == 'success') {
+            return; // Success!
+          }
+        }
+      } catch (curlError) {
+        LoggerUtil.e('Curl approach failed: $curlError');
+        // Continue to next approach
+      }
+
+      // Approach 2: Use http package with additional timeout
+      try {
+        LoggerUtil.i('Trying approach 2: Using http package with timeout');
+
+        final url = Uri.parse(AppConstants.requestResetCodeEndpoint);
+        final headers = {'Content-Type': 'application/json'};
+        final body = jsonEncode({'email': email});
+
+        LoggerUtil.i('Making HTTP request to: $url');
+        LoggerUtil.i('With headers: $headers');
+        LoggerUtil.i('With body: $body');
+
+        final httpResponse = await http
+            .post(
+              url,
+              headers: headers,
+              body: body,
+            )
+            .timeout(const Duration(seconds: 30));
+
+        LoggerUtil.i('HTTP response status code: ${httpResponse.statusCode}');
+        LoggerUtil.i('HTTP response body: ${httpResponse.body}');
+
+        if (httpResponse.statusCode == 200) {
+          final response = jsonDecode(httpResponse.body);
+          LoggerUtil.i(
+              'Password reset code request response (http): $response');
+
+          if (response['status'] == 'success') {
+            return; // Success!
+          } else {
+            throw ApiException(
+                message:
+                    response['message'] ?? 'Failed to send verification code');
+          }
+        } else {
+          throw ApiException(
+              message:
+                  'Failed to send verification code: HTTP ${httpResponse.statusCode}');
+        }
+      } catch (httpError) {
+        LoggerUtil.e('HTTP approach failed: $httpError');
+        // Continue to next approach
+      }
+
+      // Approach 3: Use Dio directly (not DioClient)
+      try {
+        LoggerUtil.i('Trying approach 3: Using Dio directly');
+
         final dio = Dio();
+        dio.options.connectTimeout = const Duration(seconds: 30);
+        dio.options.receiveTimeout = const Duration(seconds: 30);
+        dio.options.headers = {'Content-Type': 'application/json'};
 
-        // Configure Dio to accept 302 redirects as successful responses
-        dio.options.validateStatus = (status) {
-          return status != null && (status >= 200 && status < 400);
-        };
-
-        final response = await dio.post(
-          AppConstants.forgotPasswordEndpoint,
-          data: {
-            'user_login': email, // WordPress accepts either username or email
-          },
-          options: Options(
-            contentType: 'application/x-www-form-urlencoded',
-            followRedirects: true, // Allow redirects
-            responseType: ResponseType.plain, // Get the response as plain text
-          ),
+        final dioResponse = await dio.post(
+          AppConstants.requestResetCodeEndpoint,
+          data: {'email': email},
         );
 
-        LoggerUtil.i('Password reset response status: ${response.statusCode}');
-        LoggerUtil.d('Password reset response body: ${response.data}');
+        LoggerUtil.i('Dio response status code: ${dioResponse.statusCode}');
+        LoggerUtil.i('Dio response body: ${dioResponse.data}');
 
-        // If we get here, the request was successful
-        return;
-      } catch (resetError) {
-        if (resetError is ApiException) {
-          rethrow;
+        if (dioResponse.statusCode == 200) {
+          final response = dioResponse.data;
+          LoggerUtil.i('Password reset code request response (dio): $response');
+
+          if (response['status'] == 'success') {
+            return; // Success!
+          } else {
+            throw ApiException(
+                message:
+                    response['message'] ?? 'Failed to send verification code');
+          }
+        } else {
+          throw ApiException(
+              message:
+                  'Failed to send verification code: HTTP ${dioResponse.statusCode}');
         }
-
-        // If there was an error with the password reset request
-        LoggerUtil.e('Password reset request error: ${resetError.toString()}',
-            resetError);
+      } catch (dioError) {
+        LoggerUtil.e('Dio approach failed: $dioError');
+        // All approaches failed
         throw ApiException(
-            message: 'Password reset failed: ${resetError.toString()}');
+            message: 'All approaches failed to send verification code');
       }
     } catch (e) {
-      LoggerUtil.e('Password reset error: ${e.toString()}', e);
+      LoggerUtil.e('Request reset code error: ${e.toString()}', e);
 
       if (e is ApiException) {
         rethrow;
       }
 
-      throw ApiException(message: 'Password reset failed: ${e.toString()}');
+      throw ApiException(
+          message: 'Failed to request reset code: ${e.toString()}');
     }
   }
 
@@ -199,19 +287,28 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     try {
       LoggerUtil.i('Verifying reset code for email: $email, code: $code');
 
-      // Since we're using WordPress's standard password reset flow,
-      // we'll use a mock implementation for now
-      // In a real implementation, we would need to extract a token from the reset link
-      // or use a plugin that provides a code-based reset flow
+      // Ensure code is a string
+      final String codeStr = code.toString().trim();
 
-      // For testing purposes, we'll accept any 6-digit code
-      if (code.length == 6 && int.tryParse(code) != null) {
-        // Return a mock token
-        return 'mock_reset_token_${DateTime.now().millisecondsSinceEpoch}';
-      } else {
+      // Log the exact data being sent
+      LoggerUtil.i('Sending data: {"email": "$email", "code": "$codeStr"}');
+
+      final response = await _dioClient.post(
+        AppConstants.verifyResetCodeEndpoint,
+        data: {
+          'email': email,
+          'code': codeStr,
+        },
+      );
+
+      LoggerUtil.i('Verify reset code response: $response');
+
+      if (response['status'] != 'success') {
         throw ApiException(
-            message: 'Invalid verification code. Please enter a 6-digit code.');
+            message: response['message'] ?? 'Failed to verify code');
       }
+
+      return response['reset_token'] ?? '';
     } catch (e) {
       LoggerUtil.e('Verify reset code error: ${e.toString()}', e);
 
@@ -230,18 +327,22 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     try {
       LoggerUtil.i('Resetting password for email: $email');
 
-      // Since we're using WordPress's standard password reset flow,
-      // we'll use a mock implementation for now
-      // In a real implementation, we would need to use the reset link from the email
-      // or use a plugin that provides a code-based reset flow
+      final response = await _dioClient.post(
+        AppConstants.resetPasswordEndpoint,
+        data: {
+          'email': email,
+          'reset_token': resetToken,
+          'new_password': newPassword,
+        },
+      );
 
-      // For testing purposes, we'll simulate a successful password reset
-      // In a real implementation, we would make an API call to reset the password
+      LoggerUtil.i('Reset password response: $response');
 
-      // Simulate a delay to make it feel more realistic
-      await Future.delayed(const Duration(seconds: 1));
+      if (response['status'] != 'success') {
+        throw ApiException(
+            message: response['message'] ?? 'Failed to reset password');
+      }
 
-      // If we get here, the password was reset successfully
       return;
     } catch (e) {
       LoggerUtil.e('Reset password error: ${e.toString()}', e);
@@ -251,6 +352,71 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       }
 
       throw ApiException(message: 'Failed to reset password: ${e.toString()}');
+    }
+  }
+
+  @override
+  Future<void> requestRegistrationCode(String email) async {
+    try {
+      LoggerUtil.i('Requesting registration code for email: $email');
+
+      final response = await _dioClient.post(
+        AppConstants.requestRegistrationCodeEndpoint,
+        data: {
+          'email': email,
+        },
+      );
+
+      LoggerUtil.i('Registration code request response: $response');
+
+      if (response['status'] != 'success') {
+        throw ApiException(
+            message: response['message'] ?? 'Failed to send verification code');
+      }
+
+      return;
+    } catch (e) {
+      LoggerUtil.e('Request registration code error: ${e.toString()}', e);
+
+      if (e is ApiException) {
+        rethrow;
+      }
+
+      throw ApiException(
+          message: 'Failed to request registration code: ${e.toString()}');
+    }
+  }
+
+  @override
+  Future<void> verifyRegistration(String email, String code) async {
+    try {
+      LoggerUtil.i('Verifying registration for email: $email, code: $code');
+
+      final response = await _dioClient.post(
+        AppConstants.verifyRegistrationEndpoint,
+        data: {
+          'email': email,
+          'code': code,
+        },
+      );
+
+      LoggerUtil.i('Verify registration response: $response');
+
+      if (response['status'] != 'success') {
+        throw ApiException(
+            message: response['message'] ?? 'Failed to verify registration');
+      }
+
+      return;
+    } catch (e) {
+      LoggerUtil.e('Verify registration error: ${e.toString()}', e);
+
+      if (e is ApiException) {
+        rethrow;
+      }
+
+      throw ApiException(
+          message: 'Failed to verify registration: ${e.toString()}');
     }
   }
 }

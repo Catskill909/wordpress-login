@@ -18,7 +18,6 @@ class ForgotPasswordPage extends StatefulWidget {
 class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   final _formKey = GlobalKey<FormBuilderState>();
   bool _isSubmitting = false;
-  bool _isSuccess = false;
 
   @override
   Widget build(BuildContext context) {
@@ -55,11 +54,6 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                 ),
               ),
             );
-          } else if (state is Unauthenticated) {
-            setState(() {
-              _isSubmitting = false;
-              _isSuccess = true;
-            });
           }
         },
         child: SafeArea(
@@ -92,98 +86,63 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 32),
-                if (!_isSuccess)
-                  FormBuilder(
-                    key: _formKey,
-                    child: Column(
-                      children: [
-                        FormBuilderTextField(
-                          name: 'email',
-                          decoration: const InputDecoration(
-                            labelText: 'Email',
-                            prefixIcon: Icon(Icons.email),
-                          ),
-                          validator: FormBuilderValidators.compose([
-                            FormBuilderValidators.required(),
-                            FormBuilderValidators.email(),
-                          ]),
-                        ),
-                        const SizedBox(height: 24),
-                        ElevatedButton(
-                          onPressed: _isSubmitting
-                              ? null
-                              : () {
-                                  if (_formKey.currentState
-                                          ?.saveAndValidate() ??
-                                      false) {
-                                    final formData =
-                                        _formKey.currentState!.value;
-                                    context.read<AuthBloc>().add(
-                                          RequestPasswordResetCodeEvent(
-                                            email: formData['email'],
-                                          ),
-                                        );
-                                  }
-                                },
-                          child: _isSubmitting
-                              ? const SizedBox(
-                                  height: 20,
-                                  width: 20,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: Colors.white,
-                                  ),
-                                )
-                              : const Text('Reset Password'),
-                        ),
-                      ],
-                    ),
-                  )
-                else
-                  Column(
+                FormBuilder(
+                  key: _formKey,
+                  child: Column(
                     children: [
-                      const Icon(
-                        Icons.check_circle,
-                        color: Colors.green,
-                        size: 64,
-                      ),
-                      const SizedBox(height: 16),
-                      const Text(
-                        'Password Reset Email Sent',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                      FormBuilderTextField(
+                        name: 'email',
+                        decoration: const InputDecoration(
+                          labelText: 'Email',
+                          prefixIcon: Icon(Icons.email),
                         ),
-                      ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        'We\'ve sent you an email with instructions to reset your password. Please check your inbox (and spam folder).',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 16),
+                        validator: FormBuilderValidators.compose([
+                          FormBuilderValidators.required(),
+                          FormBuilderValidators.email(),
+                        ]),
                       ),
                       const SizedBox(height: 24),
                       ElevatedButton(
-                        onPressed: () {
-                          context.go('/login');
-                        },
-                        child: const Text('Back to Login'),
+                        onPressed: _isSubmitting
+                            ? null
+                            : () {
+                                if (_formKey.currentState?.saveAndValidate() ??
+                                    false) {
+                                  final formData = _formKey.currentState!.value;
+                                  context.read<AuthBloc>().add(
+                                        RequestPasswordResetCodeEvent(
+                                          email: formData['email'],
+                                        ),
+                                      );
+                                }
+                              },
+                        child: _isSubmitting
+                            ? const SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : const Text('Reset Password'),
                       ),
                     ],
                   ),
+                ),
                 const SizedBox(height: 24),
-                if (!_isSuccess)
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text('Remember your password?'),
-                      TextButton(
-                        onPressed: () {
-                          context.go('/login');
-                        },
-                        child: const Text('Sign In'),
-                      ),
-                    ],
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text('Remember your password?'),
+                    TextButton(
+                      onPressed: () {
+                        context.go('/login');
+                      },
+                      child: const Text('Sign In'),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),

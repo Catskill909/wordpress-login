@@ -1,18 +1,24 @@
-# WordPress Flutter Authentication App
+# WordPress Flutter Integration App
 
 > **IMPORTANT: NEVER PUSH TO GIT UNLESS EXPLICITLY REQUESTED BY THE USER**
 > **ALL CODE MUST BE THOROUGHLY TESTED BEFORE COMMITTING**
 
-A modern Flutter application that integrates with WordPress authentication, allowing users to log in, register, and reset passwords directly within the app.
+A modern Flutter application that integrates with WordPress APIs, allowing users to log in, register, reset passwords, and interact with WordPress content directly within the app. The app serves as a proof of concept for leveraging WordPress as a backend while providing a seamless native mobile experience.
 
 ## Features
 
 ### Authentication
 - **JWT Authentication**: Secure login using WordPress JWT Authentication
 - **User Registration**: Register new users through WordPress
-- **Password Reset**: Reset passwords through WordPress
+- **Password Reset**: Reset passwords through WordPress with email verification codes
 - **Secure Storage**: Secure token storage for persistent login
-- **Email Verification**: Email verification for new user registrations
+- **Email Verification**: Email verification for new user registrations and password reset
+
+### WordPress API Integration
+- **User Profile Management**: View and update user profiles
+- **Content Access**: Access posts, pages, and custom content types
+- **Social Features**: Share and interact with content
+- **Custom API Endpoints**: Extended WordPress functionality through custom endpoints
 
 ### Architecture
 - **Clean Architecture**: Separation of concerns with domain, data, and presentation layers
@@ -134,17 +140,22 @@ The app follows Clean Architecture principles with three main layers:
 - ✅ Logout functionality implemented and tested
 - ✅ User registration implemented and tested
 - ✅ Password reset implemented (needs testing)
-- ⬜ Email verification flow testing
+- 🔄 Email verification code mechanism in progress
+- ⬜ User profile management
+- ⬜ Content access and display
+- ⬜ Social features implementation
 - ⬜ Error handling improvements
 - ⬜ UI polish and refinements
 
 ## Next Steps
 
-1. Test the complete email verification flow
-2. Improve error handling for network issues
-3. Add loading indicators during authentication
-4. Implement remember me functionality
-5. Add unit and widget tests
+1. Complete the email verification code mechanism for password reset and registration
+2. Implement user profile management (view and update profile)
+3. Add content access features (posts, pages, custom content types)
+4. Implement social features (comments, likes, shares)
+5. Improve error handling for network issues
+6. Add comprehensive unit and widget tests
+7. Expand WordPress API integration with additional features
 
 ## Getting Started
 

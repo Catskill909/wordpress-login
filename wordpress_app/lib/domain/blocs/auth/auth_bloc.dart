@@ -28,6 +28,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<RequestPasswordResetCodeEvent>(_onRequestPasswordResetCode);
     on<VerifyPasswordResetCodeEvent>(_onVerifyPasswordResetCode);
     on<ResetPasswordEvent>(_onResetPassword);
+    on<RequestRegistrationCodeEvent>(_onRequestRegistrationCode);
+    on<VerifyRegistrationEvent>(_onVerifyRegistration);
   }
 
   Future<void> _onCheckAuthStatus(
@@ -165,6 +167,38 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     result.fold(
       (failure) => emit(AuthError(message: failure.message)),
       (_) => emit(PasswordResetSuccess()),
+    );
+  }
+
+  Future<void> _onRequestRegistrationCode(
+    RequestRegistrationCodeEvent event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(AuthLoading());
+
+    // Get repository from service locator
+    final repository = sl<AuthRepository>();
+    final result = await repository.requestRegistrationCode(event.email);
+
+    result.fold(
+      (failure) => emit(AuthError(message: failure.message)),
+      (_) => emit(RegistrationCodeSent(email: event.email)),
+    );
+  }
+
+  Future<void> _onVerifyRegistration(
+    VerifyRegistrationEvent event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(AuthLoading());
+
+    // Get repository from service locator
+    final repository = sl<AuthRepository>();
+    final result = await repository.verifyRegistration(event.email, event.code);
+
+    result.fold(
+      (failure) => emit(AuthError(message: failure.message)),
+      (_) => emit(RegistrationVerified(email: event.email)),
     );
   }
 }

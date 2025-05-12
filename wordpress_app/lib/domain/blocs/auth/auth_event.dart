@@ -89,3 +89,27 @@ class ForgotPasswordEvent extends AuthEvent {
 }
 
 class LogoutEvent extends AuthEvent {}
+
+class RequestRegistrationCodeEvent extends AuthEvent {
+  final String email;
+
+  const RequestRegistrationCodeEvent({
+    required this.email,
+  });
+
+  @override
+  List<Object> get props => [email];
+}
+
+class VerifyRegistrationEvent extends AuthEvent {
+  final String email;
+  final String code;
+
+  const VerifyRegistrationEvent({
+    required this.email,
+    required this.code,
+  });
+
+  @override
+  List<Object> get props => [email, code];
+}

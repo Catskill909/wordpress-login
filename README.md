@@ -1,9 +1,9 @@
-# WordPress Flutter Authentication App
+# WordPress Flutter Integration App
 
 > **IMPORTANT: NEVER PUSH TO GIT UNLESS EXPLICITLY REQUESTED BY THE USER**
 > **ALL CODE MUST BE THOROUGHLY TESTED BEFORE COMMITTING**
 
-A Flutter mobile application that integrates with WordPress authentication, allowing users to log in, register, and reset passwords directly within the app.
+A Flutter mobile application that integrates with WordPress APIs, allowing users to log in, register, reset passwords, and interact with WordPress content directly within the app. The app serves as a proof of concept for leveraging WordPress as a backend while providing a seamless native mobile experience.
 
 ## Documentation
 
@@ -14,8 +14,11 @@ A Flutter mobile application that integrates with WordPress authentication, allo
 ## Features
 
 - JWT Authentication with WordPress
-- User Registration
-- Password Reset
+- User Registration with Email Verification
+- Password Reset with Email Verification Codes
+- WordPress Content Integration
+- User Profile Management
+- Social Features (comments, likes, shares)
 - Modern Material Design UI
 - Clean Architecture
 
@@ -45,11 +48,15 @@ A Flutter mobile application that integrates with WordPress authentication, allo
 - ✅ Login and logout functionality is working
 - ✅ User registration is working (email verification required)
 - ✅ Password reset is implemented (needs testing)
+- 🔄 Email verification code mechanism in progress
+- ⬜ WordPress content integration features
 
 ## Next Steps
 
-1. Test the complete email verification flow
-2. Test the password reset flow
-3. Improve error handling
-4. Add UI enhancements
-5. Add comprehensive testing
+1. Complete the email verification code mechanism for password reset and registration
+2. Implement user profile management (view and update profile)
+3. Add content access features (posts, pages, custom content types)
+4. Implement social features (comments, likes, shares)
+5. Improve error handling for network issues
+6. Add comprehensive unit and widget tests
+7. Expand WordPress API integration with additional features

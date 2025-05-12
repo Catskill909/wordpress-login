@@ -1,13 +1,13 @@
-# WordPress Flutter App Project Plan
+# WordPress Flutter Integration App Project Plan
 
 > **IMPORTANT: NEVER PUSH TO GIT UNLESS EXPLICITLY REQUESTED BY THE USER**
 > **ALL CODE MUST BE THOROUGHLY TESTED BEFORE COMMITTING**
 
-This document outlines the complete project plan for the WordPress Flutter Authentication App, including completed tasks and next steps.
+This document outlines the complete project plan for the WordPress Flutter Integration App, including completed tasks and next steps.
 
 ## Project Overview
 
-A Flutter mobile application that integrates with WordPress authentication, allowing users to log in, register, and reset passwords directly within the app.
+A Flutter mobile application that integrates with WordPress APIs, allowing users to log in, register, reset passwords, and interact with WordPress content directly within the app. The app serves as a proof of concept for leveraging WordPress as a backend while providing a seamless native mobile experience.
 
 ## Completed Tasks
 
@@ -84,22 +84,39 @@ A Flutter mobile application that integrates with WordPress authentication, allo
 - ✅ Login and logout functionality is working
 - ✅ User registration is working (email verification required)
 - ✅ Password reset is implemented (needs testing)
+- 🔄 Email verification code mechanism in progress
+- ⬜ WordPress content integration features
+- ⬜ User profile management
+- ⬜ Social features implementation
 
 ## Next Steps
 
-### 1. 🔄 Email Verification Testing
+### 1. 🔄 Email Verification Code Implementation
 
+- 🔄 Implement email verification code mechanism for password reset
+- 🔄 Implement email verification code mechanism for registration
+- ⬜ Create UI for entering verification codes
+- ⬜ Implement verification code validation
+- ⬜ Add resend code functionality
 - ⬜ Test the complete email verification flow
-- ⬜ Verify that confirmation emails are being sent
-- ⬜ Verify that users can confirm their email and log in
 - ⬜ Document the email verification process
 
-### 2. 🔄 Password Reset Testing
+### 2. 🔄 WordPress Content Integration
 
-- ⬜ Test the complete password reset flow
-- ⬜ Verify that reset emails are being sent
-- ⬜ Verify that users can reset their password and log in
-- ⬜ Document the password reset process
+- ⬜ Implement post listing functionality
+- ⬜ Implement post detail view
+- ⬜ Add support for custom post types
+- ⬜ Implement content search
+- ⬜ Add content filtering and sorting
+- ⬜ Implement content caching for offline access
+
+### 3. 🔄 User Profile Management
+
+- ⬜ Create profile view screen
+- ⬜ Implement profile editing functionality
+- ⬜ Add profile picture upload
+- ⬜ Implement user settings
+- ⬜ Add account management options
 
 ### 3. 🔄 Error Handling Improvements
 
