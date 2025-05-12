@@ -1,5 +1,8 @@
 # WordPress and Flutter App Architecture Plan
 
+> **IMPORTANT: NEVER PUSH TO GIT UNLESS EXPLICITLY REQUESTED BY THE USER**
+> **ALL CODE MUST BE THOROUGHLY TESTED BEFORE COMMITTING**
+
 ## 1. System Overview
 
 This document outlines the architecture and implementation plan for a cross-platform mobile application built with Flutter that integrates with a WordPress backend. The system will provide a seamless user experience while leveraging WordPress's content management capabilities and Flutter's cross-platform development advantages.

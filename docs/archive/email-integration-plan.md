@@ -1,5 +1,8 @@
 # WordPress Email Integration Plan for Flutter App
 
+> **IMPORTANT: NEVER PUSH TO GIT UNLESS EXPLICITLY REQUESTED BY THE USER**
+> **ALL CODE MUST BE THOROUGHLY TESTED BEFORE COMMITTING**
+
 This document outlines the steps needed to implement email-based features in the Flutter app, specifically user registration with email verification and password reset functionality.
 
 ## Current Status

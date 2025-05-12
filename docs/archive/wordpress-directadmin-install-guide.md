@@ -1,5 +1,8 @@
 # WordPress and DirectAdmin Configuration Guide
 
+> **IMPORTANT: NEVER PUSH TO GIT UNLESS EXPLICITLY REQUESTED BY THE USER**
+> **ALL CODE MUST BE THOROUGHLY TESTED BEFORE COMMITTING**
+
 This guide provides step-by-step instructions for configuring WordPress plugins and DirectAdmin email settings for integration with a Flutter mobile application.
 
 ## Table of Contents

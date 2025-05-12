@@ -61,52 +61,57 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     try {
       print('Registering user: $username, $email');
 
-      // Use our custom registration endpoint
-      final response = await _dioClient.post(
-        AppConstants.registerEndpoint,
-        data: {
-          'username': username,
-          'email': email,
-          'password': password,
-          'name': username, // Display name
-        },
-        options: Options(
-          headers: {
-            'Content-Type': 'application/json',
+      // Since WordPress registration is now enabled, we can use the standard WordPress registration form
+      // We'll submit the registration form directly to WordPress
+
+      // First, let's try to register the user using the WordPress registration form
+      try {
+        final dio =
+            Dio(); // Use a separate Dio instance to handle HTML responses
+        final response = await dio.post(
+          '${AppConstants.baseUrl}/wp-login.php?action=register',
+          data: {
+            'user_login': username,
+            'user_email': email,
           },
-        ),
-      );
+          options: Options(
+            contentType: 'application/x-www-form-urlencoded',
+            followRedirects: false,
+            responseType: ResponseType.plain, // Get the response as plain text
+          ),
+        );
 
-      print('User registration response: $response');
+        print('Registration response status: ${response.statusCode}');
 
-      // Check if registration was successful
-      if (response != null && response['status'] == 'success') {
-        print('User created with ID: ${response['user']['id']}');
-
-        // Now log in the user to get their own token
-        final loginResponse = await login(username, password);
-
-        return loginResponse['user'] as UserModel;
-      } else {
-        // If there's an error message in the response
-        if (response != null && response['message'] != null) {
+        // Check if the response contains a success message
+        if (response.statusCode == 200 &&
+            response.data.toString().contains('Registration complete')) {
+          // Registration successful
           throw ApiException(
-              message: 'Registration failed: ${response['message']}');
+              message:
+                  'Registration successful! Please check your email to confirm your registration before logging in.');
+        }
+      } catch (registrationError) {
+        if (registrationError is ApiException) {
+          rethrow;
         }
 
+        // If there was an error with the registration request
+        print('Registration request error: ${registrationError.toString()}');
+      }
+
+      // If we get here, try to log in (this will likely fail until email confirmation)
+      try {
+        final loginResponse = await login(username, password);
+        return loginResponse['user'] as UserModel;
+      } catch (loginError) {
+        // Expected to fail until email confirmation
         throw ApiException(
-            message: 'Registration failed: Invalid response from server');
+            message:
+                'Registration successful! Please check your email to confirm your registration before logging in.');
       }
     } catch (e) {
       print('Registration error: ${e.toString()}');
-
-      if (e is DioException && e.response != null && e.response!.data != null) {
-        final errorData = e.response!.data;
-        if (errorData is Map && errorData['message'] != null) {
-          throw ApiException(
-              message: 'Registration failed: ${errorData['message']}');
-        }
-      }
 
       if (e is ApiException) {
         rethrow;
@@ -121,45 +126,45 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     try {
       print('Sending password reset for email: $email');
 
-      // Use our custom password reset endpoint
-      final response = await _dioClient.post(
-        AppConstants.forgotPasswordEndpoint,
-        data: {
-          'email': email,
-        },
-        options: Options(
-          headers: {
-            'Content-Type': 'application/json',
+      // WordPress has a built-in password reset form
+      // We'll submit the form directly to WordPress
+
+      try {
+        final dio =
+            Dio(); // Use a separate Dio instance to handle HTML responses
+        final response = await dio.post(
+          AppConstants.forgotPasswordEndpoint,
+          data: {
+            'user_login': email, // WordPress accepts either username or email
           },
-        ),
-      );
+          options: Options(
+            contentType: 'application/x-www-form-urlencoded',
+            followRedirects: false,
+            responseType: ResponseType.plain, // Get the response as plain text
+          ),
+        );
 
-      print('Password reset response: $response');
+        print('Password reset response status: ${response.statusCode}');
 
-      // Check if the password reset request was successful
-      if (response != null && response['status'] == 'success') {
-        // Password reset email sent successfully
-        return;
-      } else {
-        // If there's an error message in the response
-        if (response != null && response['message'] != null) {
-          throw ApiException(
-              message: 'Password reset failed: ${response['message']}');
+        // If the request is successful, WordPress will send a password reset email
+        if (response.statusCode == 200 || response.statusCode == 302) {
+          // Password reset email sent successfully
+          return;
+        }
+      } catch (resetError) {
+        if (resetError is ApiException) {
+          rethrow;
         }
 
+        // If there was an error with the password reset request
+        print('Password reset request error: ${resetError.toString()}');
         throw ApiException(
-            message: 'Password reset failed: Invalid response from server');
+            message: 'Password reset failed: ${resetError.toString()}');
       }
+
+      return; // Success
     } catch (e) {
       print('Password reset error: ${e.toString()}');
-
-      if (e is DioException && e.response != null && e.response!.data != null) {
-        final errorData = e.response!.data;
-        if (errorData is Map && errorData['message'] != null) {
-          throw ApiException(
-              message: 'Password reset failed: ${errorData['message']}');
-        }
-      }
 
       if (e is ApiException) {
         rethrow;

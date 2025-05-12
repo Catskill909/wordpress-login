@@ -1,5 +1,8 @@
 # WordPress Flutter Auth Plugin Installation Guide
 
+> **IMPORTANT: NEVER PUSH TO GIT UNLESS EXPLICITLY REQUESTED BY THE USER**
+> **ALL CODE MUST BE THOROUGHLY TESTED BEFORE COMMITTING**
+
 This guide provides instructions for installing and configuring the WordPress Flutter Auth plugin, which adds custom REST API endpoints for user registration and password reset in your Flutter app.
 
 ## 1. Plugin Installation

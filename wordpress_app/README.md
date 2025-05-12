@@ -1,30 +1,85 @@
-# WordPress Flutter App
+# WordPress Flutter Authentication App
 
-A modern Flutter application that integrates with a WordPress backend, featuring clean Material Design and authentication functionality.
+> **IMPORTANT: NEVER PUSH TO GIT UNLESS EXPLICITLY REQUESTED BY THE USER**
+> **ALL CODE MUST BE THOROUGHLY TESTED BEFORE COMMITTING**
 
-## Project Overview
-
-This project is a cross-platform mobile application built with Flutter that connects to a WordPress backend. It provides a seamless user experience with a focus on clean design and robust authentication.
+A modern Flutter application that integrates with WordPress authentication, allowing users to log in, register, and reset passwords directly within the app.
 
 ## Features
 
-- **Authentication**
-  - User login with email/username and password
-  - User registration
-  - Password reset (planned)
-  - JWT token-based authentication
+### Authentication
+- **JWT Authentication**: Secure login using WordPress JWT Authentication
+- **User Registration**: Register new users through WordPress
+- **Password Reset**: Reset passwords through WordPress
+- **Secure Storage**: Secure token storage for persistent login
+- **Email Verification**: Email verification for new user registrations
 
-- **Clean Architecture**
-  - Separation of concerns with domain, data, and presentation layers
-  - BLoC pattern for state management
-  - Repository pattern for data access
-  - Dependency injection with GetIt
+### Architecture
+- **Clean Architecture**: Separation of concerns with domain, data, and presentation layers
+- **BLoC Pattern**: Robust state management
+- **Repository Pattern**: Data access abstraction
+- **Dependency Injection**: Service locator pattern with GetIt
 
-- **Modern UI**
-  - Material Design 3
-  - Responsive layouts
-  - Form validation
-  - Loading indicators
+### UI/UX
+- **Material Design 3**: Modern, clean interface following Material Design guidelines
+- **Responsive Layouts**: Adapts to different screen sizes
+- **Form Validation**: Comprehensive input validation with real-time feedback
+- **Password Visibility Toggle**: Show/hide password with eye icon
+- **Loading Indicators**: Visual feedback during network operations
+- **Error Handling**: User-friendly error messages
+- **Animations**: Smooth transitions between screens
+
+## WordPress Configuration
+
+### Required WordPress Plugins
+- **JWT Authentication for WP-API**: Enables JWT token-based authentication
+- **WP Mail SMTP**: Configured with login@djchucks.com for reliable email delivery
+- **Advanced Custom Fields**: For extended content management
+- **Custom Post Type UI**: For custom content types
+- **JSON API**: Core controller activated for API access
+
+### WordPress Settings
+- **User Registration**: Enabled in Settings > General > "Anyone can register"
+- **Default User Role**: Set to "Subscriber"
+- **JWT Authentication**: Properly configured in wp-config.php and .htaccess
+
+## Authentication Flow
+
+### Login Flow
+1. User enters username/email and password
+2. App sends credentials to JWT authentication endpoint
+3. WordPress validates credentials and returns JWT token
+4. App stores token securely and uses it for authenticated requests
+
+### Registration Flow
+1. User enters username, email, and password
+2. App submits registration form to WordPress
+3. WordPress creates user and sends confirmation email
+4. User receives message to check email for confirmation
+5. After confirming email, user can log in with credentials
+
+### Password Reset Flow
+1. User enters email address
+2. App submits password reset form to WordPress
+3. WordPress sends password reset email
+4. User receives message to check email for reset instructions
+5. After resetting password, user can log in with new credentials
+
+## API Endpoints
+
+```dart
+// Base URLs
+static const String baseUrl = 'https://djchucks.com/tester';
+static const String apiUrl = '$baseUrl/wp-json';
+
+// JWT Authentication endpoints
+static const String loginEndpoint = '$apiUrl/jwt-auth/v1/token';
+static const String userEndpoint = '$apiUrl/wp/v2/users/me';
+
+// User management endpoints
+static const String registerEndpoint = '$baseUrl/wp-login.php?action=register';
+static const String forgotPasswordEndpoint = '$baseUrl/wp-login.php?action=lostpassword';
+```
 
 ## Project Structure
 
@@ -52,14 +107,44 @@ lib/
     └── widgets/          # Reusable widgets
 ```
 
-## WordPress Backend Requirements
+## Architecture
 
-The app requires a WordPress backend with the following plugins:
-- WP REST API (Core)
-- JWT Authentication for WP REST API
-- WP Mail SMTP (for email functionality)
-- Advanced Custom Fields (optional)
-- Custom Post Type UI (optional)
+The app follows Clean Architecture principles with three main layers:
+
+1. **Presentation Layer**: UI components and BLoC state management
+2. **Domain Layer**: Business logic and use cases
+3. **Data Layer**: Data sources and repositories
+
+## Key Packages
+
+- **flutter_bloc**: State management
+- **dio**: HTTP client for API requests
+- **flutter_secure_storage**: Secure storage for JWT tokens
+- **get_it**: Dependency injection
+- **equatable**: Value equality for models
+- **formz**: Form validation
+- **flutter_svg**: SVG rendering for icons
+- **shared_preferences**: Local storage for app settings
+
+## Development Status
+
+- ✅ WordPress backend configured with JWT Authentication
+- ✅ WP Mail SMTP configured with login@djchucks.com
+- ✅ Login functionality implemented and tested
+- ✅ Logout functionality implemented and tested
+- ✅ User registration implemented and tested
+- ✅ Password reset implemented (needs testing)
+- ⬜ Email verification flow testing
+- ⬜ Error handling improvements
+- ⬜ UI polish and refinements
+
+## Next Steps
+
+1. Test the complete email verification flow
+2. Improve error handling for network issues
+3. Add loading indicators during authentication
+4. Implement remember me functionality
+5. Add unit and widget tests
 
 ## Getting Started
 
@@ -71,20 +156,33 @@ The app requires a WordPress backend with the following plugins:
 ### Installation
 
 1. Clone the repository
+   ```
+   git clone https://github.com/Catskill909/wordpress-login.git
+   ```
 2. Install dependencies:
    ```
    flutter pub get
    ```
-3. Update the API endpoints in `lib/core/constants/app_constants.dart` to point to your WordPress site
-4. Run the app:
+3. Run the app:
    ```
    flutter run
    ```
 
-## Next Steps
+## Troubleshooting
 
-- Configure WordPress plugins
-- Set up DirectAdmin email settings
-- Implement content display from WordPress
-- Add offline capabilities
-- Enhance user profile management
+### Common Issues
+
+1. **JWT Authentication Errors**
+   - Verify JWT plugin is properly configured
+   - Check secret key in wp-config.php
+   - Ensure CORS is properly configured
+
+2. **Registration Issues**
+   - Verify user registration is enabled in WordPress
+   - Check if email confirmation is required
+   - Verify email delivery is working
+
+3. **Password Reset Issues**
+   - Check if WP Mail SMTP is properly configured
+   - Verify email delivery is working
+   - Check spam folder for reset emails
