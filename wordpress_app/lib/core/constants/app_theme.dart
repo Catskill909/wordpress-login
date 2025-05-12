@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
   static const Color primaryColor = Color(0xFF1976D2);
@@ -55,32 +56,32 @@ class AppTheme {
       ),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
     ),
-    textTheme: const TextTheme(
-      displayLarge: TextStyle(
+    textTheme: TextTheme(
+      displayLarge: GoogleFonts.poppins(
         fontSize: 32,
         fontWeight: FontWeight.bold,
         color: Colors.black87,
       ),
-      displayMedium: TextStyle(
+      displayMedium: GoogleFonts.poppins(
         fontSize: 28,
         fontWeight: FontWeight.bold,
         color: Colors.black87,
       ),
-      displaySmall: TextStyle(
+      displaySmall: GoogleFonts.poppins(
         fontSize: 24,
         fontWeight: FontWeight.bold,
         color: Colors.black87,
       ),
-      headlineMedium: TextStyle(
+      headlineMedium: GoogleFonts.poppins(
         fontSize: 20,
         fontWeight: FontWeight.bold,
         color: Colors.black87,
       ),
-      bodyLarge: TextStyle(
+      bodyLarge: GoogleFonts.roboto(
         fontSize: 16,
         color: Colors.black87,
       ),
-      bodyMedium: TextStyle(
+      bodyMedium: GoogleFonts.roboto(
         fontSize: 14,
         color: Colors.black87,
       ),
