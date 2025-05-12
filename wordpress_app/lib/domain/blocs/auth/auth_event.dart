@@ -37,4 +37,55 @@ class RegisterEvent extends AuthEvent {
   List<Object> get props => [username, email, password];
 }
 
+class RequestPasswordResetCodeEvent extends AuthEvent {
+  final String email;
+
+  const RequestPasswordResetCodeEvent({
+    required this.email,
+  });
+
+  @override
+  List<Object> get props => [email];
+}
+
+class VerifyPasswordResetCodeEvent extends AuthEvent {
+  final String email;
+  final String code;
+
+  const VerifyPasswordResetCodeEvent({
+    required this.email,
+    required this.code,
+  });
+
+  @override
+  List<Object> get props => [email, code];
+}
+
+class ResetPasswordEvent extends AuthEvent {
+  final String email;
+  final String resetToken;
+  final String newPassword;
+
+  const ResetPasswordEvent({
+    required this.email,
+    required this.resetToken,
+    required this.newPassword,
+  });
+
+  @override
+  List<Object> get props => [email, resetToken, newPassword];
+}
+
+// Legacy event (kept for backward compatibility)
+class ForgotPasswordEvent extends AuthEvent {
+  final String email;
+
+  const ForgotPasswordEvent({
+    required this.email,
+  });
+
+  @override
+  List<Object> get props => [email];
+}
+
 class LogoutEvent extends AuthEvent {}

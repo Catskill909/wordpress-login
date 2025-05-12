@@ -22,20 +22,20 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Either<Failure, User>> login(String username, String password) async {
     try {
       final result = await _remoteDataSource.login(username, password);
-      
+
       // Save token
       await _secureStorageService.saveString(
         AppConstants.tokenKey,
         result['token'],
       );
-      
+
       // Save user data
       final user = result['user'] as UserModel;
       await _secureStorageService.saveObject(
         AppConstants.userKey,
         (result['user'] as UserModel).toJson(),
       );
-      
+
       return Right(user);
     } on ApiException catch (e) {
       return Left(AuthenticationFailure(message: e.message));
@@ -47,7 +47,8 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, User>> register(String username, String email, String password) async {
+  Future<Either<Failure, User>> register(
+      String username, String email, String password) async {
     try {
       final user = await _remoteDataSource.register(username, email, password);
       return Right(user);
@@ -59,7 +60,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, void>> forgotPassword(String email) async {
+  Future<Either<Failure, void>> requestPasswordResetCode(String email) async {
     try {
       await _remoteDataSource.forgotPassword(email);
       return const Right(null);
@@ -71,23 +72,56 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  Future<Either<Failure, String>> verifyPasswordResetCode(
+      String email, String code) async {
+    try {
+      final resetToken = await _remoteDataSource.verifyResetCode(email, code);
+      return Right(resetToken);
+    } on ApiException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    } catch (e) {
+      return Left(ServerFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> resetPassword(
+      String email, String resetToken, String newPassword) async {
+    try {
+      await _remoteDataSource.resetPassword(email, resetToken, newPassword);
+      return const Right(null);
+    } on ApiException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    } catch (e) {
+      return Left(ServerFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> forgotPassword(String email) async {
+    // This is now just a wrapper around requestPasswordResetCode for backward compatibility
+    return requestPasswordResetCode(email);
+  }
+
+  @override
   Future<Either<Failure, User>> getCurrentUser() async {
     try {
       // First try to get from local storage
-      final userData = await _secureStorageService.getObject(AppConstants.userKey);
+      final userData =
+          await _secureStorageService.getObject(AppConstants.userKey);
       if (userData != null) {
         return Right(UserModel.fromJson(userData));
       }
-      
+
       // If not available, fetch from API
       final user = await _remoteDataSource.getCurrentUser();
-      
+
       // Save to local storage
       await _secureStorageService.saveObject(
         AppConstants.userKey,
         user.toJson(),
       );
-      
+
       return Right(user);
     } on ApiException catch (e) {
       return Left(AuthenticationFailure(message: e.message));
@@ -114,7 +148,8 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<bool> isLoggedIn() async {
     try {
-      final token = await _secureStorageService.getString(AppConstants.tokenKey);
+      final token =
+          await _secureStorageService.getString(AppConstants.tokenKey);
       return token != null;
     } catch (_) {
       return false;

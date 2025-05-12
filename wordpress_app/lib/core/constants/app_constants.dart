@@ -10,6 +10,15 @@ class AppConstants {
 
   // API endpoints
   static const String registerEndpoint = '$apiUrl/wp/v2/users';
+
+  // BDVS Password Reset plugin endpoints
+  static const String requestResetCodeEndpoint =
+      '$apiUrl/bdpwr/v1/reset-password';
+  static const String verifyResetCodeEndpoint =
+      '$apiUrl/bdpwr/v1/validate-code';
+  static const String resetPasswordEndpoint = '$apiUrl/bdpwr/v1/set-password';
+
+  // Legacy password reset endpoint (kept for reference)
   static const String forgotPasswordEndpoint =
       '$baseUrl/wp-login.php?action=lostpassword';
 

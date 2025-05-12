@@ -24,6 +24,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<LoginEvent>(_onLogin);
     on<RegisterEvent>(_onRegister);
     on<LogoutEvent>(_onLogout);
+    on<ForgotPasswordEvent>(_onForgotPassword);
+    on<RequestPasswordResetCodeEvent>(_onRequestPasswordResetCode);
+    on<VerifyPasswordResetCodeEvent>(_onVerifyPasswordResetCode);
+    on<ResetPasswordEvent>(_onResetPassword);
   }
 
   Future<void> _onCheckAuthStatus(
@@ -97,6 +101,70 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     result.fold(
       (failure) => emit(AuthError(message: failure.message)),
       (_) => emit(Unauthenticated()),
+    );
+  }
+
+  Future<void> _onForgotPassword(
+    ForgotPasswordEvent event,
+    Emitter<AuthState> emit,
+  ) async {
+    // This is now just a wrapper around _onRequestPasswordResetCode for backward compatibility
+    add(RequestPasswordResetCodeEvent(email: event.email));
+  }
+
+  Future<void> _onRequestPasswordResetCode(
+    RequestPasswordResetCodeEvent event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(AuthLoading());
+
+    // Get repository from service locator
+    final repository = sl<AuthRepository>();
+    final result = await repository.requestPasswordResetCode(event.email);
+
+    result.fold(
+      (failure) => emit(AuthError(message: failure.message)),
+      (_) => emit(PasswordResetCodeSent(email: event.email)),
+    );
+  }
+
+  Future<void> _onVerifyPasswordResetCode(
+    VerifyPasswordResetCodeEvent event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(AuthLoading());
+
+    // Get repository from service locator
+    final repository = sl<AuthRepository>();
+    final result =
+        await repository.verifyPasswordResetCode(event.email, event.code);
+
+    result.fold(
+      (failure) => emit(AuthError(message: failure.message)),
+      (resetToken) => emit(PasswordResetCodeVerified(
+        email: event.email,
+        resetToken: resetToken,
+      )),
+    );
+  }
+
+  Future<void> _onResetPassword(
+    ResetPasswordEvent event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(AuthLoading());
+
+    // Get repository from service locator
+    final repository = sl<AuthRepository>();
+    final result = await repository.resetPassword(
+      event.email,
+      event.resetToken,
+      event.newPassword,
+    );
+
+    result.fold(
+      (failure) => emit(AuthError(message: failure.message)),
+      (_) => emit(PasswordResetSuccess()),
     );
   }
 }

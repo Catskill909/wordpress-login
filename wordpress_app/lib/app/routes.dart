@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:wordpress_app/domain/blocs/auth/auth_bloc.dart';
 import 'package:wordpress_app/domain/blocs/auth/auth_state.dart';
+import 'package:wordpress_app/presentation/pages/forgot_password_page.dart';
 import 'package:wordpress_app/presentation/pages/home_page.dart';
 import 'package:wordpress_app/presentation/pages/login_page.dart';
 import 'package:wordpress_app/presentation/pages/register_page.dart';
@@ -21,9 +22,13 @@ class AppRouter {
       final isLoggedIn = authState is Authenticated;
       final isLoginRoute = state.matchedLocation == '/login';
       final isRegisterRoute = state.matchedLocation == '/register';
+      final isForgotPasswordRoute = state.matchedLocation == '/forgot-password';
 
-      // If not logged in and not on login or register page, redirect to login
-      if (!isLoggedIn && !isLoginRoute && !isRegisterRoute) {
+      // If not logged in and not on login, register, or forgot password page, redirect to login
+      if (!isLoggedIn &&
+          !isLoginRoute &&
+          !isRegisterRoute &&
+          !isForgotPasswordRoute) {
         return '/login';
       }
 
@@ -47,6 +52,10 @@ class AppRouter {
       GoRoute(
         path: '/register',
         builder: (context, state) => RegisterPage(),
+      ),
+      GoRoute(
+        path: '/forgot-password',
+        builder: (context, state) => const ForgotPasswordPage(),
       ),
     ],
     errorBuilder: (context, state) => Scaffold(
