@@ -8,9 +8,10 @@ This document outlines the steps needed to implement email-based features in the
 - ✅ WP Mail SMTP is configured with login@djchucks.com
 - ✅ Login and logout functionality is working in the Flutter app
 - ✅ JSON API core plugin installed and activated
-- ✅ JSON API User plugin installed but User controller is not activated
-- ✅ Registration functionality updated to use WordPress REST API with admin authentication
-- ✅ Password reset functionality updated to use WordPress REST API with admin authentication
+- ❌ JSON API User plugin installed but User controller is not activated
+- ✅ Custom WordPress plugin created for registration and password reset
+- ✅ Registration functionality updated to use custom plugin endpoint
+- ✅ Password reset functionality updated to use custom plugin endpoint
 
 ## 1. User Registration with Email Verification
 
@@ -46,23 +47,18 @@ This document outlines the steps needed to implement email-based features in the
 
 1. **Update API Constants**: ✅
    - Open `lib/core/constants/app_constants.dart`
-   - Update the registration endpoint to use WordPress REST API with admin authentication:
+   - Update the registration endpoint to use our custom WordPress plugin endpoints:
      ```dart
-     static const String jsonApiUrl = '$baseUrl/?json=';
-     static const String registerEndpoint = '$apiUrl/wp/v2/users';
+     static const String registerEndpoint = '$apiUrl/wp/v2/users/register';
      static const String forgotPasswordEndpoint = '$apiUrl/wp/v2/users/lostpassword';
-
-     // Admin credentials for creating users (only for demo purposes)
-     static const String adminUsername = 'admin';
-     static const String adminPassword = 'password'; // Replace with actual admin password
      ```
 
 2. **Update Registration Data Source**: ✅
-   - Modify the `register` method in `auth_remote_data_source.dart` to use admin authentication
-   - First get an admin token using the JWT authentication endpoint
-   - Then create the user with the admin token in the Authorization header
-   - Add proper error handling for the WordPress REST API response format
-   - Update the password reset method to use admin authentication as well
+   - Modify the `register` method in `auth_remote_data_source.dart` to use our custom plugin endpoint
+   - Send user registration data directly to the endpoint
+   - Handle the custom response format from our plugin
+   - Add proper error handling for various error scenarios
+   - Update the password reset method to use our custom plugin endpoint as well
 
 3. **Implement Registration UI**:
    - Complete the registration screen in `lib/presentation/pages/register_page.dart`
@@ -78,9 +74,9 @@ This document outlines the steps needed to implement email-based features in the
 
 ### 2.1 WordPress Configuration
 
-1. **Configure Password Reset Endpoint**:
-   - The JSON API User plugin should also provide a password reset endpoint
-   - Verify it's available at `https://djchucks.com/tester/wp-json/json-api-user/lost-password`
+1. **Configure Password Reset Endpoint**: ✅
+   - Our custom WordPress plugin provides a password reset endpoint
+   - Available at `https://djchucks.com/tester/wp-json/wp/v2/users/lostpassword`
 
 2. **Test Password Reset Endpoint**:
    - Use ReqBin or Postman to test the endpoint
@@ -91,14 +87,15 @@ This document outlines the steps needed to implement email-based features in the
      }
      ```
    - Verify that a password reset email is sent to the provided address
+   - Check that the response includes a success status and message
 
 ### 2.2 Flutter App Implementation
 
-1. **Update API Constants**:
+1. **Update API Constants**: ✅
    - Open `lib/core/constants/app_constants.dart`
-   - Update the forgot password endpoint:
+   - Update the forgot password endpoint to use our custom plugin endpoint:
      ```dart
-     static const String forgotPasswordEndpoint = '$apiUrl/json-api-user/lost-password';
+     static const String forgotPasswordEndpoint = '$apiUrl/wp/v2/users/lostpassword';
      ```
 
 2. **Create Forgot Password Screen**:
