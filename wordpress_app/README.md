@@ -171,6 +171,7 @@ The app follows Clean Architecture principles with three main layers:
 - ✅ Password reset with email verification implemented and tested
 - ✅ Email verification code mechanism for password reset working
 - ✅ Navigation after password reset fixed
+- ✅ Email delivery working for Gmail (Yahoo may filter to spam)
 - 🔄 Registration email verification in progress
 - ⬜ User profile management
 - ⬜ Content access and display
@@ -182,12 +183,13 @@ The app follows Clean Architecture principles with three main layers:
 
 1. Complete the email verification code mechanism for registration
 2. Fix iOS keychain persistence behavior in debug mode
-3. Implement user profile management (view and update profile)
-4. Add content access features (posts, pages, custom content types)
-5. Implement social features (comments, likes, shares)
-6. Improve error handling for network issues
-7. Add comprehensive unit and widget tests
-8. Expand WordPress API integration with additional features
+3. Improve email deliverability for Yahoo Mail (see stop-spam.md)
+4. Implement user profile management (view and update profile)
+5. Add content access features (posts, pages, custom content types)
+6. Implement social features (comments, likes, shares)
+7. Improve error handling for network issues
+8. Add comprehensive unit and widget tests
+9. Expand WordPress API integration with additional features
 
 ## Getting Started
 
@@ -219,6 +221,16 @@ The app follows Clean Architecture principles with three main layers:
 - Added proper GoRouter integration for consistent navigation
 - Ensured login screen properly redirects to home screen after successful login
 - Documented iOS keychain persistence behavior
+- Simplified email sending implementation for better reliability
+- Verified email delivery working in both debug and release builds
+- Created spam prevention analysis document (stop-spam.md)
+
+## Documentation
+
+### Additional Documentation Files
+
+- **stop-spam.md**: Analysis and solutions for email deliverability issues, particularly for Yahoo Mail
+- **wordpress-directadmin-install-guide.md**: Guide for setting up WordPress and DirectAdmin
 
 ## Troubleshooting
 
@@ -237,8 +249,9 @@ The app follows Clean Architecture principles with three main layers:
 3. **Password Reset Issues**
    - Check if WP Mail SMTP is properly configured
    - Verify email delivery is working
-   - Check spam folder for reset emails
+   - Check spam folder for reset emails (especially for Yahoo Mail)
    - Ensure the custom WordPress plugin endpoints are working
+   - See stop-spam.md for detailed analysis of email deliverability
 
 4. **iOS Keychain Persistence**
    - On iOS, keychain data persists between app installations
