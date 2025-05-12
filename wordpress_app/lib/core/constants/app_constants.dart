@@ -11,6 +11,8 @@ class AppConstants {
 
   // API endpoints
   static const String registerEndpoint = '$apiUrl/wp/v2/users';
+  static const String usersEndpoint = '$apiUrl/wp/v2/users';
+  static const String mediaEndpoint = '$apiUrl/wp/v2/media';
 
   // Custom WordPress Flutter Auth plugin endpoints
   // Password reset endpoints

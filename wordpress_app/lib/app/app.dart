@@ -5,6 +5,8 @@ import 'package:wordpress_app/core/constants/app_theme.dart';
 import 'package:wordpress_app/core/di/service_locator.dart';
 import 'package:wordpress_app/domain/blocs/auth/auth_bloc.dart';
 import 'package:wordpress_app/domain/blocs/auth/auth_event.dart';
+import 'package:wordpress_app/domain/blocs/profile/profile_bloc.dart';
+import 'package:wordpress_app/domain/blocs/profile/profile_event.dart';
 
 class App extends StatelessWidget {
   const App({super.key});
@@ -15,6 +17,9 @@ class App extends StatelessWidget {
       providers: [
         BlocProvider<AuthBloc>(
           create: (context) => sl<AuthBloc>()..add(CheckAuthStatusEvent()),
+        ),
+        BlocProvider<ProfileBloc>(
+          create: (context) => sl<ProfileBloc>()..add(const LoadProfileEvent()),
         ),
       ],
       child: Builder(

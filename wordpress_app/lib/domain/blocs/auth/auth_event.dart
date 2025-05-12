@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:wordpress_app/domain/entities/user.dart';
 
 abstract class AuthEvent extends Equatable {
   const AuthEvent();
@@ -112,4 +113,15 @@ class VerifyRegistrationEvent extends AuthEvent {
 
   @override
   List<Object> get props => [email, code];
+}
+
+class RefreshUserEvent extends AuthEvent {
+  final User user;
+
+  const RefreshUserEvent({
+    required this.user,
+  });
+
+  @override
+  List<Object> get props => [user];
 }

@@ -48,15 +48,15 @@ A Flutter mobile application that integrates with WordPress APIs, allowing users
 - ✅ Login and logout functionality is working
 - ✅ User registration is working (email verification required)
 - ✅ Password reset is implemented (needs testing)
-- 🔄 Email verification code mechanism in progress
+- ✅ Email verification code mechanism is working
+- ✅ Profile image upload and display is working
 - ⬜ WordPress content integration features
 
 ## Next Steps
 
-1. Complete the email verification code mechanism for password reset and registration
-2. Implement user profile management (view and update profile)
-3. Add content access features (posts, pages, custom content types)
-4. Implement social features (comments, likes, shares)
-5. Improve error handling for network issues
-6. Add comprehensive unit and widget tests
-7. Expand WordPress API integration with additional features
+1. Add additional user profile management features (update name, email, etc.)
+2. Add content access features (posts, pages, custom content types)
+3. Implement social features (comments, likes, shares)
+4. Improve error handling for network issues
+5. Add comprehensive unit and widget tests
+6. Expand WordPress API integration with additional features

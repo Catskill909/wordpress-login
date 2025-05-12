@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wordpress_app/core/di/service_locator.dart';
+import 'package:wordpress_app/core/utils/logger_util.dart';
 import 'package:wordpress_app/domain/blocs/auth/auth_event.dart';
 import 'package:wordpress_app/domain/blocs/auth/auth_state.dart';
 import 'package:wordpress_app/domain/repositories/auth_repository.dart';
@@ -30,6 +31,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<ResetPasswordEvent>(_onResetPassword);
     on<RequestRegistrationCodeEvent>(_onRequestRegistrationCode);
     on<VerifyRegistrationEvent>(_onVerifyRegistration);
+    on<RefreshUserEvent>(_onRefreshUser);
   }
 
   Future<void> _onCheckAuthStatus(
@@ -200,5 +202,30 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       (failure) => emit(AuthError(message: failure.message)),
       (_) => emit(RegistrationVerified(email: event.email)),
     );
+  }
+
+  // Handle refreshing user data when profile is updated
+  void _onRefreshUser(
+    RefreshUserEvent event,
+    Emitter<AuthState> emit,
+  ) {
+    LoggerUtil.d(
+        'Refreshing user data with new avatar URL: ${event.user.avatarUrl}');
+
+    // Get the current state
+    final currentState = state;
+
+    // Only update if we're already authenticated
+    if (currentState is Authenticated) {
+      LoggerUtil.d('Current avatar URL: ${currentState.user.avatarUrl}');
+      LoggerUtil.d('New avatar URL: ${event.user.avatarUrl}');
+
+      // Update the authenticated state with the new user data
+      emit(Authenticated(user: event.user));
+      LoggerUtil.d('Auth state updated with new user data');
+    } else {
+      LoggerUtil.w(
+          'Not updating auth state because current state is not Authenticated');
+    }
   }
 }

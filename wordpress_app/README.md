@@ -16,6 +16,9 @@ A modern Flutter application that integrates with WordPress APIs, allowing users
 
 ### WordPress API Integration
 - **User Profile Management**: View and update user profiles
+  - View profile information (username, email, etc.)
+  - Upload and update profile image
+  - Default profile image for new users
 - **Content Access**: Access posts, pages, and custom content types
 - **Social Features**: Share and interact with content
 - **Custom API Endpoints**: Extended WordPress functionality through custom endpoints
@@ -104,6 +107,8 @@ static const String userEndpoint = '$apiUrl/wp/v2/users/me';
 
 // User management endpoints
 static const String registerEndpoint = '$apiUrl/wp/v2/users';
+static const String usersEndpoint = '$apiUrl/wp/v2/users';
+static const String mediaEndpoint = '$apiUrl/wp/v2/media';
 
 // Custom WordPress Flutter Auth plugin endpoints
 // Password reset endpoints
@@ -160,6 +165,9 @@ The app follows Clean Architecture principles with three main layers:
 - **formz**: Form validation
 - **flutter_svg**: SVG rendering for icons
 - **shared_preferences**: Local storage for app settings
+- **image_picker**: Select images from gallery or camera
+- **image_cropper**: Crop and resize images
+- **cached_network_image**: Cache and display network images
 
 ## Development Status
 
@@ -172,8 +180,9 @@ The app follows Clean Architecture principles with three main layers:
 - ✅ Email verification code mechanism for password reset working
 - ✅ Navigation after password reset fixed
 - ✅ Email delivery working for Gmail (Yahoo may filter to spam)
-- 🔄 Registration email verification in progress
-- ⬜ User profile management
+- ✅ Registration email verification implemented and tested
+- ✅ Profile image upload and display implemented and tested
+- 🔄 Additional user profile management features in progress
 - ⬜ Content access and display
 - ⬜ Social features implementation
 - ⬜ Error handling improvements
@@ -181,15 +190,14 @@ The app follows Clean Architecture principles with three main layers:
 
 ## Next Steps
 
-1. Complete the email verification code mechanism for registration
-2. Fix iOS keychain persistence behavior in debug mode
-3. Improve email deliverability for Yahoo Mail (see stop-spam.md)
-4. Implement user profile management (view and update profile)
-5. Add content access features (posts, pages, custom content types)
-6. Implement social features (comments, likes, shares)
-7. Improve error handling for network issues
-8. Add comprehensive unit and widget tests
-9. Expand WordPress API integration with additional features
+1. Fix iOS keychain persistence behavior in debug mode
+2. Improve email deliverability for Yahoo Mail (see stop-spam.md)
+3. Implement additional user profile management features (update name, email, etc.)
+4. Add content access features (posts, pages, custom content types)
+5. Implement social features (comments, likes, shares)
+6. Improve error handling for network issues
+7. Add comprehensive unit and widget tests
+8. Expand WordPress API integration with additional features
 
 ## Getting Started
 
@@ -214,6 +222,15 @@ The app follows Clean Architecture principles with three main layers:
    ```
 
 ## Recent Updates
+
+### Profile Image Feature (July 2024)
+- Implemented profile image upload and display functionality
+- Added support for selecting images from the device gallery
+- Integrated image cropping for better user experience
+- Ensured compatibility with iPhone's HEIC image format
+- Added default profile image for new users
+- Implemented proper error handling for image upload failures
+- Updated user interface to show profile image and camera icon
 
 ### Password Reset Flow Improvements (July 2024)
 - Implemented complete password reset flow with email verification codes

@@ -1,3 +1,4 @@
+import 'package:wordpress_app/core/utils/logger_util.dart';
 import 'package:wordpress_app/domain/entities/user.dart';
 
 class UserModel extends User {
@@ -12,14 +13,61 @@ class UserModel extends User {
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
+    // Log the JSON for debugging
+    LoggerUtil.d('UserModel.fromJson: $json');
+
+    // Check for avatar_url in different locations
+    String? avatarUrl = json['avatar_url'] as String?;
+
+    // If avatar_url is not directly in the JSON, check in avatar_urls
+    if (avatarUrl == null && json.containsKey('avatar_urls')) {
+      final avatarUrls = json['avatar_urls'];
+      if (avatarUrls is Map && avatarUrls.containsKey('96')) {
+        // Use the largest avatar (96px)
+        avatarUrl = avatarUrls['96'] as String?;
+        LoggerUtil.d('Found avatar_url in avatar_urls: $avatarUrl');
+      }
+    }
+
+    // If still not found, check in meta
+    if (avatarUrl == null && json.containsKey('meta') && json['meta'] != null) {
+      final meta = json['meta'];
+      if (meta is Map && meta.containsKey('avatar_url')) {
+        avatarUrl = meta['avatar_url'] as String?;
+        LoggerUtil.d('Found avatar_url in meta: $avatarUrl');
+      }
+    }
+
+    // Handle different field names in WordPress API
+    String username = '';
+    if (json.containsKey('username')) {
+      username = json['username'] as String;
+    } else if (json.containsKey('slug')) {
+      username = json['slug'] as String;
+    } else if (json.containsKey('name')) {
+      username = json['name'] as String;
+    }
+
+    // Handle email field
+    String email = '';
+    if (json.containsKey('email')) {
+      email = json['email'] as String;
+    }
+
+    // Handle roles field
+    List<String> roles = [];
+    if (json.containsKey('roles')) {
+      roles = (json['roles'] as List<dynamic>).map((e) => e as String).toList();
+    }
+
     return UserModel(
       id: json['id'] as int,
-      username: json['username'] as String,
-      email: json['email'] as String,
+      username: username,
+      email: email,
       firstName: json['first_name'] as String?,
       lastName: json['last_name'] as String?,
-      avatarUrl: json['avatar_url'] as String?,
-      roles: (json['roles'] as List<dynamic>).map((e) => e as String).toList(),
+      avatarUrl: avatarUrl,
+      roles: roles,
     );
   }
 
