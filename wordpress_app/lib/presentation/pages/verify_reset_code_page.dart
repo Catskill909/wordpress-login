@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:go_router/go_router.dart';
 import 'package:wordpress_app/domain/blocs/auth/auth_bloc.dart';
 import 'package:wordpress_app/domain/blocs/auth/auth_event.dart';
 import 'package:wordpress_app/domain/blocs/auth/auth_state.dart';
@@ -38,7 +39,7 @@ class _VerifyResetCodePageState extends State<VerifyResetCodePage> {
           });
 
           if (state is PasswordResetCodeVerified) {
-            // Navigate to reset password page
+            // Navigate to reset password page using context.push
             Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (context) => ResetPasswordPage(
@@ -66,7 +67,7 @@ class _VerifyResetCodePageState extends State<VerifyResetCodePage> {
             icon: const Icon(Icons.arrow_back),
             onPressed: () {
               // Go back to the forgot password page
-              Navigator.of(context).pop();
+              context.pop();
             },
           ),
         ),
@@ -160,7 +161,7 @@ class _VerifyResetCodePageState extends State<VerifyResetCodePage> {
                     TextButton(
                       onPressed: () {
                         // Go back to the forgot password page
-                        Navigator.of(context).pop();
+                        context.pop();
                       },
                       child: const Text('Back to Forgot Password'),
                     ),

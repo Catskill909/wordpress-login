@@ -30,6 +30,16 @@ class _LoginPageState extends State<LoginPage> {
                 backgroundColor: Colors.red,
               ),
             );
+          } else if (state is Authenticated) {
+            // Navigate to home page when authenticated
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Login successful!'),
+                backgroundColor: Colors.green,
+              ),
+            );
+            // Explicitly navigate to home page
+            context.go('/');
           }
         },
         child: SafeArea(

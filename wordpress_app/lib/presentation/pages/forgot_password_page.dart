@@ -46,7 +46,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
               _isSubmitting = false;
             });
 
-            // Navigate to verification code page
+            // Navigate to verification code page using Navigator.push
+            // We're keeping this approach since VerifyResetCodePage needs the email parameter
+            // and GoRouter doesn't have a built-in way to pass complex objects
             Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (context) => VerifyResetCodePage(

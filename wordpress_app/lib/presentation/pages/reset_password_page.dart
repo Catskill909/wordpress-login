@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:go_router/go_router.dart';
 import 'package:wordpress_app/domain/blocs/auth/auth_bloc.dart';
 import 'package:wordpress_app/domain/blocs/auth/auth_event.dart';
 import 'package:wordpress_app/domain/blocs/auth/auth_state.dart';
-import 'package:wordpress_app/presentation/pages/login_page.dart';
 import 'package:wordpress_app/presentation/widgets/loading_overlay.dart';
 import 'package:wordpress_app/presentation/widgets/password_field.dart';
 
@@ -50,11 +50,8 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
               ),
             );
 
-            // Navigate to login page
-            Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(builder: (context) => const LoginPage()),
-              (route) => false,
-            );
+            // Navigate to login page using GoRouter
+            context.go('/login');
           } else if (state is AuthError) {
             // Show error message
             ScaffoldMessenger.of(context).showSnackBar(
@@ -72,7 +69,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
             onPressed: () {
-              Navigator.of(context).pop();
+              context.pop();
             },
           ),
         ),
@@ -174,7 +171,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                           TextButton(
                             onPressed: () {
                               // Go back to the verification code page
-                              Navigator.of(context).pop();
+                              context.pop();
                             },
                             child: const Text('Back to Verification'),
                           ),
