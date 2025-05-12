@@ -9,15 +9,9 @@ class AppConstants {
   static const String userEndpoint = '$apiUrl/wp/v2/users/me';
 
   // API endpoints
-  static const String registerEndpoint = '$apiUrl/wp/v2/users';
+  static const String registerEndpoint = '$apiUrl/wp/v2/users/register';
   static const String forgotPasswordEndpoint =
       '$apiUrl/wp/v2/users/lostpassword';
-
-  // Admin credentials for creating users (only for demo purposes)
-  // In a production app, these would be stored securely or retrieved from environment variables
-  static const String adminUsername = 'admin';
-  static const String adminPassword =
-      'admin123'; // Using a default password for testing
 
   // Storage Keys
   static const String tokenKey = 'auth_token';
