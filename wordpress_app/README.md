@@ -43,11 +43,24 @@ A modern Flutter application that integrates with WordPress APIs, allowing users
 - **Advanced Custom Fields**: For extended content management
 - **Custom Post Type UI**: For custom content types
 - **JSON API**: Core controller activated for API access
+- **WP Flutter Auth**: Custom plugin for email verification codes (password reset and registration)
 
 ### WordPress Settings
 - **User Registration**: Enabled in Settings > General > "Anyone can register"
 - **Default User Role**: Set to "Subscriber"
 - **JWT Authentication**: Properly configured in wp-config.php and .htaccess
+
+### Custom WordPress Plugin
+The WP Flutter Auth plugin provides custom endpoints for email verification:
+
+- **Password Reset Flow**:
+  - `/wp-json/wp-flutter/v1/request-reset-code`: Sends verification code email
+  - `/wp-json/wp-flutter/v1/verify-reset-code`: Verifies code and returns reset token
+  - `/wp-json/wp-flutter/v1/reset-password`: Resets password using token
+
+- **Registration Verification Flow**:
+  - `/wp-json/wp-flutter/v1/request-registration-code`: Sends verification code email
+  - `/wp-json/wp-flutter/v1/verify-registration`: Verifies registration code
 
 ## Authentication Flow
 
@@ -59,17 +72,22 @@ A modern Flutter application that integrates with WordPress APIs, allowing users
 
 ### Registration Flow
 1. User enters username, email, and password
-2. App submits registration form to WordPress
-3. WordPress creates user and sends confirmation email
-4. User receives message to check email for confirmation
-5. After confirming email, user can log in with credentials
+2. App submits registration form to WordPress API
+3. WordPress creates user (pending verification)
+4. App requests verification code to be sent to user's email
+5. User enters verification code in the app
+6. App verifies code with WordPress to activate the account
+7. After successful verification, user can log in with credentials
 
 ### Password Reset Flow
 1. User enters email address
-2. App submits password reset form to WordPress
-3. WordPress sends password reset email
-4. User receives message to check email for reset instructions
-5. After resetting password, user can log in with new credentials
+2. App submits password reset request to custom WordPress plugin endpoint
+3. WordPress sends verification code email via WP Mail SMTP
+4. User enters verification code in the app
+5. App verifies code with WordPress and receives reset token
+6. User creates new password and submits with reset token
+7. After successful password reset, user is redirected to login screen
+8. User can log in with new credentials
 
 ## API Endpoints
 
@@ -77,14 +95,25 @@ A modern Flutter application that integrates with WordPress APIs, allowing users
 // Base URLs
 static const String baseUrl = 'https://djchucks.com/tester';
 static const String apiUrl = '$baseUrl/wp-json';
+static const String jsonApiUrl = '$baseUrl/?json=';
+static const String wpFlutterApiUrl = '$apiUrl/wp-flutter/v1';
 
 // JWT Authentication endpoints
 static const String loginEndpoint = '$apiUrl/jwt-auth/v1/token';
 static const String userEndpoint = '$apiUrl/wp/v2/users/me';
 
 // User management endpoints
-static const String registerEndpoint = '$baseUrl/wp-login.php?action=register';
-static const String forgotPasswordEndpoint = '$baseUrl/wp-login.php?action=lostpassword';
+static const String registerEndpoint = '$apiUrl/wp/v2/users';
+
+// Custom WordPress Flutter Auth plugin endpoints
+// Password reset endpoints
+static const String requestResetCodeEndpoint = '$wpFlutterApiUrl/request-reset-code';
+static const String verifyResetCodeEndpoint = '$wpFlutterApiUrl/verify-reset-code';
+static const String resetPasswordEndpoint = '$wpFlutterApiUrl/reset-password';
+
+// Registration verification endpoints
+static const String requestRegistrationCodeEndpoint = '$wpFlutterApiUrl/request-registration-code';
+static const String verifyRegistrationEndpoint = '$wpFlutterApiUrl/verify-registration';
 ```
 
 ## Project Structure
@@ -139,8 +168,10 @@ The app follows Clean Architecture principles with three main layers:
 - ✅ Login functionality implemented and tested
 - ✅ Logout functionality implemented and tested
 - ✅ User registration implemented and tested
-- ✅ Password reset implemented (needs testing)
-- 🔄 Email verification code mechanism in progress
+- ✅ Password reset with email verification implemented and tested
+- ✅ Email verification code mechanism for password reset working
+- ✅ Navigation after password reset fixed
+- 🔄 Registration email verification in progress
 - ⬜ User profile management
 - ⬜ Content access and display
 - ⬜ Social features implementation
@@ -149,13 +180,14 @@ The app follows Clean Architecture principles with three main layers:
 
 ## Next Steps
 
-1. Complete the email verification code mechanism for password reset and registration
-2. Implement user profile management (view and update profile)
-3. Add content access features (posts, pages, custom content types)
-4. Implement social features (comments, likes, shares)
-5. Improve error handling for network issues
-6. Add comprehensive unit and widget tests
-7. Expand WordPress API integration with additional features
+1. Complete the email verification code mechanism for registration
+2. Fix iOS keychain persistence behavior in debug mode
+3. Implement user profile management (view and update profile)
+4. Add content access features (posts, pages, custom content types)
+5. Implement social features (comments, likes, shares)
+6. Improve error handling for network issues
+7. Add comprehensive unit and widget tests
+8. Expand WordPress API integration with additional features
 
 ## Getting Started
 
@@ -179,6 +211,15 @@ The app follows Clean Architecture principles with three main layers:
    flutter run
    ```
 
+## Recent Updates
+
+### Password Reset Flow Improvements (July 2024)
+- Implemented complete password reset flow with email verification codes
+- Fixed navigation issue after successful password reset
+- Added proper GoRouter integration for consistent navigation
+- Ensured login screen properly redirects to home screen after successful login
+- Documented iOS keychain persistence behavior
+
 ## Troubleshooting
 
 ### Common Issues
@@ -197,3 +238,10 @@ The app follows Clean Architecture principles with three main layers:
    - Check if WP Mail SMTP is properly configured
    - Verify email delivery is working
    - Check spam folder for reset emails
+   - Ensure the custom WordPress plugin endpoints are working
+
+4. **iOS Keychain Persistence**
+   - On iOS, keychain data persists between app installations
+   - This is standard iOS behavior for security reasons
+   - In debug mode, users may be automatically logged in after reinstalling
+   - A future update will clear auth data on first launch in debug mode

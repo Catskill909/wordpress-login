@@ -1,7 +1,4 @@
-import 'dart:convert';
-import 'dart:io';
 import 'package:dio/dio.dart';
-import 'package:http/http.dart' as http;
 import 'package:wordpress_app/core/constants/app_constants.dart';
 import 'package:wordpress_app/core/errors/exceptions.dart';
 import 'package:wordpress_app/core/network/dio_client.dart';
@@ -142,124 +139,22 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     try {
       LoggerUtil.i('Requesting password reset code for email: $email');
 
-      // Try multiple approaches to ensure the request goes through
+      // Use the DioClient directly - this is the most reliable approach
+      final response = await _dioClient.post(
+        AppConstants.requestResetCodeEndpoint,
+        data: {
+          'email': email,
+        },
+      );
 
-      // Approach 1: Use Process.run to execute curl command directly
-      try {
-        LoggerUtil.i('Trying approach 1: Using Process.run with curl');
+      LoggerUtil.i('Password reset code request response: $response');
 
-        final result = await Process.run('curl', [
-          '-v',
-          '-X',
-          'POST',
-          '-H',
-          'Content-Type: application/json',
-          '-d',
-          '{"email":"$email"}',
-          AppConstants.requestResetCodeEndpoint,
-        ]);
-
-        LoggerUtil.i('Curl stdout: ${result.stdout}');
-        LoggerUtil.i('Curl stderr: ${result.stderr}');
-
-        if (result.exitCode == 0) {
-          final response = jsonDecode(result.stdout.toString());
-          LoggerUtil.i(
-              'Password reset code request response (curl): $response');
-
-          if (response['status'] == 'success') {
-            return; // Success!
-          }
-        }
-      } catch (curlError) {
-        LoggerUtil.e('Curl approach failed: $curlError');
-        // Continue to next approach
-      }
-
-      // Approach 2: Use http package with additional timeout
-      try {
-        LoggerUtil.i('Trying approach 2: Using http package with timeout');
-
-        final url = Uri.parse(AppConstants.requestResetCodeEndpoint);
-        final headers = {'Content-Type': 'application/json'};
-        final body = jsonEncode({'email': email});
-
-        LoggerUtil.i('Making HTTP request to: $url');
-        LoggerUtil.i('With headers: $headers');
-        LoggerUtil.i('With body: $body');
-
-        final httpResponse = await http
-            .post(
-              url,
-              headers: headers,
-              body: body,
-            )
-            .timeout(const Duration(seconds: 30));
-
-        LoggerUtil.i('HTTP response status code: ${httpResponse.statusCode}');
-        LoggerUtil.i('HTTP response body: ${httpResponse.body}');
-
-        if (httpResponse.statusCode == 200) {
-          final response = jsonDecode(httpResponse.body);
-          LoggerUtil.i(
-              'Password reset code request response (http): $response');
-
-          if (response['status'] == 'success') {
-            return; // Success!
-          } else {
-            throw ApiException(
-                message:
-                    response['message'] ?? 'Failed to send verification code');
-          }
-        } else {
-          throw ApiException(
-              message:
-                  'Failed to send verification code: HTTP ${httpResponse.statusCode}');
-        }
-      } catch (httpError) {
-        LoggerUtil.e('HTTP approach failed: $httpError');
-        // Continue to next approach
-      }
-
-      // Approach 3: Use Dio directly (not DioClient)
-      try {
-        LoggerUtil.i('Trying approach 3: Using Dio directly');
-
-        final dio = Dio();
-        dio.options.connectTimeout = const Duration(seconds: 30);
-        dio.options.receiveTimeout = const Duration(seconds: 30);
-        dio.options.headers = {'Content-Type': 'application/json'};
-
-        final dioResponse = await dio.post(
-          AppConstants.requestResetCodeEndpoint,
-          data: {'email': email},
-        );
-
-        LoggerUtil.i('Dio response status code: ${dioResponse.statusCode}');
-        LoggerUtil.i('Dio response body: ${dioResponse.data}');
-
-        if (dioResponse.statusCode == 200) {
-          final response = dioResponse.data;
-          LoggerUtil.i('Password reset code request response (dio): $response');
-
-          if (response['status'] == 'success') {
-            return; // Success!
-          } else {
-            throw ApiException(
-                message:
-                    response['message'] ?? 'Failed to send verification code');
-          }
-        } else {
-          throw ApiException(
-              message:
-                  'Failed to send verification code: HTTP ${dioResponse.statusCode}');
-        }
-      } catch (dioError) {
-        LoggerUtil.e('Dio approach failed: $dioError');
-        // All approaches failed
+      if (response['status'] != 'success') {
         throw ApiException(
-            message: 'All approaches failed to send verification code');
+            message: response['message'] ?? 'Failed to send verification code');
       }
+
+      return;
     } catch (e) {
       LoggerUtil.e('Request reset code error: ${e.toString()}', e);
 
