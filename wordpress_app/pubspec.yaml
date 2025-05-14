@@ -73,6 +73,7 @@ dependencies:
   logger: ^2.0.2+1
   dartz: ^0.10.1
   async: ^2.11.0
+  flutter_widget_from_html: ^0.16.0
 
 dev_dependencies:
   flutter_test:

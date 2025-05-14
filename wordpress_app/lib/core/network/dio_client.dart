@@ -36,7 +36,7 @@ class DioClient {
       onRequest: (options, handler) async {
         final token = await _secureStorage.read(key: AppConstants.tokenKey);
         // DEBUG LOG: Print token value for diagnostics
-        print('[DioClient] Attaching token: $token');
+        // print removed (was for debugging): '[DioClient] Attaching token: $token');
         if (token != null) {
           options.headers['Authorization'] = 'Bearer $token';
         }

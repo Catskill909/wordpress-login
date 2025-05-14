@@ -9,6 +9,7 @@ import 'package:wordpress_app/domain/blocs/auth/auth_state.dart';
 import 'package:wordpress_app/domain/blocs/profile/profile_bloc.dart';
 import 'package:wordpress_app/domain/blocs/profile/profile_event.dart';
 import 'package:wordpress_app/domain/blocs/profile/profile_state.dart';
+import 'package:wordpress_app/presentation/pages/category_posts_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -127,7 +128,7 @@ class _HomePageState extends State<HomePage> {
                                       avatarUrl = profileState.user.avatarUrl;
                                     }
                                     // DEBUG: Print the avatarUrl being used
-                                    print('[HomePage] Displaying avatarUrl: $avatarUrl');
+                                    // print removed (was for debugging): '[HomePage] Displaying avatarUrl: $avatarUrl');
                                     return Stack(
                                       children: [
                                         CircleAvatar(
@@ -214,7 +215,7 @@ class _HomePageState extends State<HomePage> {
                                 value: state.user.roles.join(', '),
                               ),
                             ],
-                            // TODO: Add more fields here if UserModel is extended (e.g. displayName, nickname, etc.)
+                            // If UserModel is extended (e.g. displayName, nickname, etc.), add more fields here.
 
                           ],
                         ),
@@ -222,35 +223,76 @@ class _HomePageState extends State<HomePage> {
                     ),
                     const SizedBox(height: 24),
                     const Text(
-                      'Content Placeholder',
+                      'Categories',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     const SizedBox(height: 16),
-                    SizedBox(
-                      height: 400, // Adjust as needed
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(),
-                        itemCount: 10,
-                        itemBuilder: (context, index) {
-                          return Card(
-                            margin: const EdgeInsets.only(bottom: 16),
-                            child: ListTile(
-                              leading: Container(
-                                width: 50,
-                                height: 50,
-                                color: Colors.grey[300],
-                                child: const Icon(Icons.article),
-                              ),
-                              title: Text('Content Item ${index + 1}'),
-                              subtitle: Text('This is a placeholder for WordPress content item ${index + 1}'),
-                              trailing: const Icon(Icons.arrow_forward_ios),
-                              onTap: () {
-                                // Navigate to content detail
-                              },
+                    Card(
+                      elevation: 2,
+                      margin: const EdgeInsets.only(bottom: 12),
+                      child: ListTile(
+                        leading: const CircleAvatar(child: Text('FR')),
+                        title: const Text('French'),
+                        trailing: const Icon(Icons.arrow_forward_ios),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => CategoryPostsPage(categoryName: 'French', categoryId: 6),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    Card(
+                      elevation: 2,
+                      margin: const EdgeInsets.only(bottom: 12),
+                      child: ListTile(
+                        leading: const CircleAvatar(child: Text('EN')),
+                        title: const Text('English'),
+                        trailing: const Icon(Icons.arrow_forward_ios),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => CategoryPostsPage(categoryName: 'English', categoryId: 4),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    Card(
+                      elevation: 2,
+                      margin: const EdgeInsets.only(bottom: 12),
+                      child: ListTile(
+                        leading: const CircleAvatar(child: Text('SP')),
+                        title: const Text('Spanish'),
+                        trailing: const Icon(Icons.arrow_forward_ios),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => CategoryPostsPage(categoryName: 'Spanish', categoryId: 5),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    Card(
+                      elevation: 2,
+                      margin: const EdgeInsets.only(bottom: 12),
+                      child: ListTile(
+                        leading: const CircleAvatar(child: Text('GE')),
+                        title: const Text('German'),
+                        trailing: const Icon(Icons.arrow_forward_ios),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => CategoryPostsPage(categoryName: 'German', categoryId: 3),
                             ),
                           );
                         },
