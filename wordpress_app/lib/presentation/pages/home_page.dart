@@ -91,175 +91,173 @@ class _HomePageState extends State<HomePage> {
           if (state is Authenticated) {
             return Padding(
               padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Welcome to WordPress App',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Welcome to WordPress App',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                  Card(
-                    elevation: 4,
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              const Text(
-                                'Your Profile',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
+                    const SizedBox(height: 16),
+                    Card(
+                      elevation: 4,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                const Text(
+                                  'Your Profile',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
-                              ),
-                              const Spacer(),
-                              BlocBuilder<ProfileBloc, ProfileState>(
-                                builder: (context, profileState) {
-                                  // Determine which avatar URL to use
-                                  String? avatarUrl = state.user.avatarUrl;
-
-                                  // If profile was updated, use the new avatar URL
-                                  if (profileState is ProfileImageUpdated) {
-                                    avatarUrl = profileState.user.avatarUrl;
-                                  }
-
-                                  return Stack(
-                                    children: [
-                                      // Use a key to force rebuild when avatarUrl changes
-                                      CircleAvatar(
-                                        key: ValueKey(avatarUrl ?? 'default'),
-                                        radius: 40,
-                                        backgroundColor: Colors.grey[200],
-                                        backgroundImage: avatarUrl != null
-                                            ? NetworkImage(avatarUrl)
-                                            : const AssetImage(
-                                                    'assets/images/default_profile.png')
-                                                as ImageProvider,
-                                      ),
-                                      Positioned(
-                                        right: 0,
-                                        bottom: 0,
-                                        child: Container(
-                                          height: 30,
-                                          width: 30,
-                                          decoration: BoxDecoration(
-                                            color:
-                                                Theme.of(context).primaryColor,
-                                            shape: BoxShape.circle,
-                                          ),
-                                          child: InkWell(
-                                            onTap: () {
-                                              if (profileState
-                                                  is ProfileImageUpdating) {
-                                                // Show loading indicator if image is being updated
-                                                return;
-                                              }
-                                              _pickImage(context);
-                                            },
-                                            child: const Icon(
-                                              Icons.camera_alt,
-                                              color: Colors.white,
-                                              size: 16,
-                                            ),
-                                          ),
+                                const Spacer(),
+                                BlocBuilder<ProfileBloc, ProfileState>(
+                                  builder: (context, profileState) {
+                                    String? avatarUrl = state.user.avatarUrl;
+                                    if (profileState is ProfileImageUpdated) {
+                                      avatarUrl = profileState.user.avatarUrl;
+                                    }
+                                    // DEBUG: Print the avatarUrl being used
+                                    print('[HomePage] Displaying avatarUrl: $avatarUrl');
+                                    return Stack(
+                                      children: [
+                                        CircleAvatar(
+                                          key: ValueKey(avatarUrl ?? 'default'),
+                                          radius: 40,
+                                          backgroundImage: avatarUrl != null
+                                              ? NetworkImage(avatarUrl)
+                                              : const AssetImage('assets/images/default_profile.png') as ImageProvider,
                                         ),
-                                      ),
-                                      if (profileState is ProfileImageUpdating)
-                                        Positioned.fill(
+                                        Positioned(
+                                          right: 0,
+                                          bottom: 0,
                                           child: Container(
+                                            height: 30,
+                                            width: 30,
                                             decoration: BoxDecoration(
-                                              color:
-                                                  Colors.black.withAlpha(128),
+                                              color: Theme.of(context).primaryColor,
                                               shape: BoxShape.circle,
                                             ),
-                                            child: const Center(
-                                              child: CircularProgressIndicator(
-                                                valueColor:
-                                                    AlwaysStoppedAnimation<
-                                                        Color>(Colors.white),
+                                            child: InkWell(
+                                              onTap: () {
+                                                if (profileState is ProfileImageUpdating) {
+                                                  return;
+                                                }
+                                                _pickImage(context);
+                                              },
+                                              child: const Icon(
+                                                Icons.camera_alt,
+                                                color: Colors.white,
+                                                size: 16,
                                               ),
                                             ),
                                           ),
                                         ),
-                                    ],
-                                  );
-                                },
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 24),
-                          _buildProfileItem(
-                            icon: Icons.person,
-                            title: 'Username',
-                            value: state.user.username,
-                          ),
-                          const Divider(),
-                          _buildProfileItem(
-                            icon: Icons.email,
-                            title: 'Email',
-                            value: state.user.email,
-                          ),
-                          if (state.user.firstName != null) ...[
+                                        if (profileState is ProfileImageUpdating)
+                                          Positioned.fill(
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                color: Colors.black.withAlpha(128),
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: const Center(
+                                                child: CircularProgressIndicator(
+                                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                      ],
+                                    );
+                                  },
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 24),
+                            _buildProfileItem(
+                              icon: Icons.person,
+                              title: 'Username',
+                              value: state.user.username.isNotEmpty ? state.user.username : '-',
+                            ),
+                            const Divider(),
+                            _buildProfileItem(
+                              icon: Icons.email,
+                              title: 'Email',
+                              value: (state.user.email.isNotEmpty) ? state.user.email : '-',
+                            ),
                             const Divider(),
                             _buildProfileItem(
                               icon: Icons.badge,
                               title: 'First Name',
-                              value: state.user.firstName!,
+                              value: (state.user.firstName != null && state.user.firstName!.isNotEmpty) ? state.user.firstName! : '-',
                             ),
-                          ],
-                          if (state.user.lastName != null) ...[
                             const Divider(),
                             _buildProfileItem(
                               icon: Icons.badge,
                               title: 'Last Name',
-                              value: state.user.lastName!,
+                              value: (state.user.lastName != null && state.user.lastName!.isNotEmpty) ? state.user.lastName! : '-',
                             ),
+                            if (state.user.roles.isNotEmpty) ...[
+                              const Divider(),
+                              _buildProfileItem(
+                                icon: Icons.security,
+                                title: 'Roles',
+                                value: state.user.roles.join(', '),
+                              ),
+                            ],
+                            // TODO: Add more fields here if UserModel is extended (e.g. displayName, nickname, etc.)
+
                           ],
-                        ],
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 24),
-                  const Text(
-                    'Content Placeholder',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                    const SizedBox(height: 24),
+                    const Text(
+                      'Content Placeholder',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: 10,
-                      itemBuilder: (context, index) {
-                        return Card(
-                          margin: const EdgeInsets.only(bottom: 16),
-                          child: ListTile(
-                            leading: Container(
-                              width: 50,
-                              height: 50,
-                              color: Colors.grey[300],
-                              child: const Icon(Icons.article),
+                    const SizedBox(height: 16),
+                    SizedBox(
+                      height: 400, // Adjust as needed
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: 10,
+                        itemBuilder: (context, index) {
+                          return Card(
+                            margin: const EdgeInsets.only(bottom: 16),
+                            child: ListTile(
+                              leading: Container(
+                                width: 50,
+                                height: 50,
+                                color: Colors.grey[300],
+                                child: const Icon(Icons.article),
+                              ),
+                              title: Text('Content Item ${index + 1}'),
+                              subtitle: Text('This is a placeholder for WordPress content item ${index + 1}'),
+                              trailing: const Icon(Icons.arrow_forward_ios),
+                              onTap: () {
+                                // Navigate to content detail
+                              },
                             ),
-                            title: Text('Content Item ${index + 1}'),
-                            subtitle: Text(
-                                'This is a placeholder for WordPress content item ${index + 1}'),
-                            trailing: const Icon(Icons.arrow_forward_ios),
-                            onTap: () {
-                              // Navigate to content detail
-                            },
-                          ),
-                        );
-                      },
+                          );
+                        },
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             );
           }

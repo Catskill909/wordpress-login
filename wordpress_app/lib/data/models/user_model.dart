@@ -29,12 +29,17 @@ class UserModel extends User {
       }
     }
 
-    // If still not found, check in meta
-    if (avatarUrl == null && json.containsKey('meta') && json['meta'] != null) {
+    // If still not found, check in meta for custom_avatar_url
+    if (json.containsKey('meta') && json['meta'] != null) {
       final meta = json['meta'];
-      if (meta is Map && meta.containsKey('avatar_url')) {
-        avatarUrl = meta['avatar_url'] as String?;
-        LoggerUtil.d('Found avatar_url in meta: $avatarUrl');
+      if (meta is Map) {
+        if (meta.containsKey('custom_avatar_url') && (meta['custom_avatar_url'] as String?)?.isNotEmpty == true) {
+          avatarUrl = meta['custom_avatar_url'] as String?;
+          LoggerUtil.d('Found avatar_url in meta[custom_avatar_url]: $avatarUrl');
+        } else if (avatarUrl == null && meta.containsKey('avatar_url')) {
+          avatarUrl = meta['avatar_url'] as String?;
+          LoggerUtil.d('Found avatar_url in meta[avatar_url]: $avatarUrl');
+        }
       }
     }
 

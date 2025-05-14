@@ -224,8 +224,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(Authenticated(user: event.user));
       LoggerUtil.d('Auth state updated with new user data');
     } else {
-      LoggerUtil.w(
-          'Not updating auth state because current state is not Authenticated');
+  
     }
   }
 }

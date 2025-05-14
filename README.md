@@ -52,6 +52,27 @@ A Flutter mobile application that integrates with WordPress APIs, allowing users
 - ✅ Profile image upload and display is working
 - ⬜ WordPress content integration features
 
+## WordPress Content Integration & Extensibility
+
+This app now features a robust Dart view model (`WordpressPost`) for consuming the WordPress posts API. The model is designed to be extensible and highlights the versatility of WordPress as a backend for mobile apps.
+
+### WordpressPost Model Fields (Key Features)
+- id, title, content, excerpt, slug, status, link, date, modified
+- author, featuredMedia, categories, tags
+- format, sticky
+- featuredMediaUrl (optional, for rich media integration)
+
+This model can be easily extended to support:
+- Custom fields (ACF, plugin meta)
+- Comments, users, and media endpoints
+- Taxonomies, custom post types, and more
+
+### Future Development
+- See [docs/README.md](./docs/README.md) for future dev notes, including:
+  - Portable WordPress+Flutter stack vision
+  - Plugin compatibility and extensibility
+  - Advanced API features and proof-of-concept ideas
+
 ## Next Steps
 
 1. Add additional user profile management features (update name, email, etc.)

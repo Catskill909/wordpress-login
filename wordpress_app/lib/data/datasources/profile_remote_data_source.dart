@@ -96,12 +96,10 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
         '${AppConstants.usersEndpoint}/$userId',
         data: {
           'meta': {
-            'avatar_url': avatarUrl,
+            'custom_avatar_url': avatarUrl,
           },
         },
       );
-
-      LoggerUtil.i('Update response: $response');
 
       // Create a modified response with the avatar URL if it's not in the response
       final Map<String, dynamic> userJson = Map<String, dynamic>.from(response);

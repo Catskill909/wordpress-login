@@ -106,28 +106,16 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<Either<Failure, User>> getCurrentUser() async {
     try {
-      // First try to get from local storage
-      final userData =
-          await _secureStorageService.getObject(AppConstants.userKey);
+      // Always fetch from API first
+      final user = await _remoteDataSource.getCurrentUser();
+      await _secureStorageService.saveObject(AppConstants.userKey, user.toJson());
+      return Right(user);
+    } catch (e) {
+      // Fallback to cache if API fails
+      final userData = await _secureStorageService.getObject(AppConstants.userKey);
       if (userData != null) {
         return Right(UserModel.fromJson(userData));
       }
-
-      // If not available, fetch from API
-      final user = await _remoteDataSource.getCurrentUser();
-
-      // Save to local storage
-      await _secureStorageService.saveObject(
-        AppConstants.userKey,
-        user.toJson(),
-      );
-
-      return Right(user);
-    } on ApiException catch (e) {
-      return Left(AuthenticationFailure(message: e.message));
-    } on CacheException catch (e) {
-      return Left(CacheFailure(message: e.message));
-    } catch (e) {
       return Left(ServerFailure(message: e.toString()));
     }
   }
